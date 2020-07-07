@@ -1,7 +1,10 @@
 import express from 'express';
+import feedbackReportsRoutes from './feedback-reports';
+import bugReportsRoutes from './bug-reports';
 
 const router = express.Router();
 
-router.get('/hello-world', (req, res) => res.send('Hello world!'));
+router.use('/feedback', feedbackReportsRoutes);
+router.use('/bugs', bugReportsRoutes);
 
 export default router;

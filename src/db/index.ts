@@ -1,20 +1,28 @@
-import env from '../config/env';
-import { MongoClient } from 'mongodb';
+import { Collection } from 'mongodb';
 
-export async function connect(): Promise<any> {
-    const { DB_URL } = env;
-    const db = MongoClient.connect(DB_URL, {
-        useUnifiedTopology: true,
-    }).catch((err) => console.log(err));
+import { connectToMongo } from './mongo';
+import initExample, { Example as ExampleType } from './feedback-reports';
 
-    return db.then((client) => client.db('feedback-portal'));
+/**
+ * re-export anything from the collection files
+ */
+export { close, mongoRetry } from './mongo';
+
+/**
+ * declare collections here, they won't be undefined before being called
+ * guaranteed by calling connect on startup before we ever use any collections
+ */
+let Example: Collection<ExampleType>;
+
+/**
+ * connects to mongo and initializes collections
+ */
+export async function connect(): Promise<void> {
+    await connectToMongo();
+    // also need to declare collections
+    Example = initExample();
 }
 
-// TODO: replace this with your driver code
-export async function query(): Promise<any> {
-    return connect().then((db) =>
-        db.collection('test').insertOne({
-            hello: 'bye',
-        })
-    );
-}
+export default {
+    Example: (): Collection<ExampleType> => Example,
+};

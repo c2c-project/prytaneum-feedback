@@ -1,5 +1,5 @@
 import env from './env';
 
-const dbName = 'prytaneum-example-service';
+const dbName = 'feedback-portal';
 
 export default { dbName, url: env.DB_URL };
