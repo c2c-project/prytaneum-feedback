@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import app from 'app';
 import { connect, query } from 'db';
 import env from 'config/env';
@@ -15,9 +16,7 @@ async function makeServer() {
         app.listen(Number(env.PORT), env.ORIGIN);
         console.log(`http://${env.ORIGIN}:${env.PORT}`);
     } catch (e) {
-        // eslint-disable-next-line no-console
         console.error(e);
-        // eslint-disable-next-line no-console
         console.log('Exiting...');
     }
 }
