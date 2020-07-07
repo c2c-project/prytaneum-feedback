@@ -7,8 +7,8 @@ services:
         ports:
             - '3000:3000'
         ###### uncomment below as appropriate
-        # depends_on:
-        #     - mongo
+        depends_on:
+            - mongo
         #     - postgresql
         #     - rabbitmq
         #     - redis
