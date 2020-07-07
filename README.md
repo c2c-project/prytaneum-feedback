@@ -98,8 +98,6 @@ Collection that stores bug reports of the form:
             -   status 404 :
                 -   message: 'Some error occurred. Please try again' 
     
-​
-​
     -  /get-reports/:submitterId
         - HTTP Method: Get
         - Description: Retrieves all feedback reports created by a specific submitter
@@ -142,7 +140,7 @@ Collection that stores bug reports of the form:
         - Body of request:
             ```
                 {
-                    Id : ObjectId // Id of the report to delete
+                    Id : ObjectId // Id of the report to delete~
                 }
             ```
         - Response:
