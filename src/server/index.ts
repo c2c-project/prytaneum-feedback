@@ -1,5 +1,5 @@
 import app from 'app';
-import { connect } from 'db';
+import { connect, query } from 'db';
 import env from 'config/env';
 
 async function makeServer() {
@@ -9,6 +9,9 @@ async function makeServer() {
             before the server exposes itself on a port
         */
         await connect();
+       // const x = await db.collection('test').find().toArray();
+        //console.log(x);
+
         app.listen(Number(env.PORT), env.ORIGIN);
         console.log(`http://${env.ORIGIN}:${env.PORT}`);
     } catch (e) {

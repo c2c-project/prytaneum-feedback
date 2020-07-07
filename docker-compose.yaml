@@ -13,8 +13,10 @@ services:
         #     - rabbitmq
         #     - redis
     ###### uncomment the correponsing db's/services you need
-    # mongo:
-    #     image: mongo:4.2.8-bionic
+    mongo:
+        image: mongo:4.2.8-bionic
+        ports:
+            - 27017:27017
     # postgresql:
     #     image: postgres:12.3
     # redis:

@@ -3,6 +3,8 @@ import createError from 'http-errors';
 import config from 'config/app';
 import env from 'config/env';
 import routes from 'routes';
+import feedbackRouter from '../routes/feedback';
+import bugRouter from '../routes/feedback';
 
 function initApp(): Express {
     const app = express();
@@ -11,6 +13,8 @@ function initApp(): Express {
         app.get('/', (req, res) => res.sendStatus(200));
     }
     app.use(routes);
+    app.use('/feedback', feedbackRouter);
+    app.use('/bugs', bugRouter);
     app.use((req, res, next) => {
         next(createError(404));
     });
