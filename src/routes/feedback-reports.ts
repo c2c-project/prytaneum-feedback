@@ -18,7 +18,7 @@ router.post('/create-report', async (req, res) => {
 });
 
 router.get('/get-reports', async (req, res) => {
-    // TO OD: THIS API CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
+    // TO DO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
         const feedbackReports = await getReports();
         res.statusCode = 200;
