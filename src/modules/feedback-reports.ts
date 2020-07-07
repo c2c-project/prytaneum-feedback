@@ -1,4 +1,5 @@
-import feedbackReports, { FeedbackReport } from '../db/feedback-reports';
+import { FeedbackReport } from '../db/feedback-reports';
+import Collections from '../db';
 
 export const createReport = (
     feedbackReport: Partial<FeedbackReport>
@@ -14,9 +15,13 @@ export const createReport = (
         throw Error('Submitter is required');
     }
 
-    return feedbackReports().insertOne({ date, description, submitter });
+    return Collections.FeedbackReport().insertOne({
+        date,
+        description,
+        submitter,
+    });
 };
 
 export const getReports = (): Promise<FeedbackReport[]> => {
-    return feedbackReports().find().toArray();
+    return Collections.FeedbackReport().find().toArray();
 };

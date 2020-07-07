@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import app from 'app';
-import { connectToMongo as connectToDb } from 'db/mongo';
-import env from 'config/env';
 import log from 'lib/log';
+import env from 'config/env';
+import { connect as connectToDb } from '../db';
 
 async function makeServer() {
     try {
