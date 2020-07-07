@@ -1,10 +1,13 @@
-import { FeedbackReport } from '../db/feedback-reports';
-import Collections from '../db';
+import { InsertOneWriteOpResult, WithId } from 'mongodb';
+
+import Collections from 'db';
+import { FeedbackReport } from 'db/feedback-reports';
 
 export const createReport = (
     feedbackReport: Partial<FeedbackReport>
-): Promise<any> => {
+): Promise<InsertOneWriteOpResult<WithId<FeedbackReport>>> => {
     const { date, description, submitter } = feedbackReport;
+    // TO DO: ADD MORE VERBOSE VALIDATION
     if (!date) {
         throw Error('Date is required');
     }

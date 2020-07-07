@@ -26,4 +26,5 @@ export async function connect(): Promise<void> {
 
 export default {
     FeedbackReport: (): Collection<FeedbackReportType> => FeedbackReport,
+    // Add more collections
 };

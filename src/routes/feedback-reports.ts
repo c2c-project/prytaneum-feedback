@@ -1,4 +1,5 @@
 import express from 'express';
+import log from 'lib/log';
 import { FeedbackReport } from '../db/feedback-reports';
 import { createReport, getReports } from '../modules/feedback-reports';
 
@@ -11,20 +12,19 @@ router.post('/create-report', async (req, res) => {
         res.statusMessage = 'Feedback successfully submitted';
         res.sendStatus(200);
     } catch (error) {
-        console.log(error);
+        log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';
         res.sendStatus(400);
     }
 });
 
 router.get('/get-reports', async (req, res) => {
-    // TO DO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
+    // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
         const feedbackReports = await getReports();
-        res.statusCode = 200;
-        res.send({ reports: feedbackReports });
+        res.status(200).send({ reports: feedbackReports });
     } catch (error) {
-        console.log(error);
+        log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';
         res.sendStatus(400);
     }
