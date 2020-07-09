@@ -1,8 +1,7 @@
 import { Collection } from 'mongodb';
+import { FeedbackReport as FeedbackReportType } from 'lib/Interfaces';
 import { connectToMongo } from './mongo';
-import initFeedbackReports, {
-    FeedbackReport as FeedbackReportType,
-} from './feedback-reports';
+import initFeedbackReports from './feedback-reports';
 
 /**
  * re-export anything from the collection files
