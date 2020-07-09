@@ -47,11 +47,14 @@ router.get('/get-reports', async (req: Request, res: Response) => {
     }
 });
 
+interface GetReportsRequestBody {
+    user: User;
+}
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
         // TODO: Find a way to give types to descructured objects
         const { submitterId } = req.params;
-        const user: User = req.body.user;
+        const { user } = req.body as GetReportsRequestBody;
         // If the id of the submitter does not match the id of the calling user then access to reports is denied
         if (submitterId !== user._id) {
             throw Error('Calling user is not owner of the report');
@@ -68,14 +71,22 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     }
 });
 
+interface UpdateReportRequestBody {
+    Id: string;
+    newDescription: string;
+    user: User;
+}
 router.post('/update-report', async (req: Request, res: Response) => {
     try {
-        // TODO: Find a way to give types to descructured objects
-        const { Id, newDescription, user } = req.body;
+        const {
+            Id,
+            newDescription,
+            user,
+        } = req.body as UpdateReportRequestBody;
         const feedbackReport: FeedbackReport | null = await getReportById(Id);
         if (feedbackReport === null) {
             throw Error('Feedback report does not exist');
-        } else if (feedbackReport?.submitter._id != user._id) {
+        } else if (feedbackReport?.submitter._id !== user._id) {
             throw Error('Calling user is not owner of the report');
         } else {
             await updateReport(Id, newDescription);
@@ -89,14 +100,18 @@ router.post('/update-report', async (req: Request, res: Response) => {
     }
 });
 
+interface DeleteReportRequestBody {
+    Id: string;
+    user: User;
+}
+
 router.post('/delete-report', async (req: Request, res: Response) => {
     try {
-        // TODO: Find a way to give types to destructured objects
-        const { Id, user } = req.body;
+        const { Id, user } = req.body as DeleteReportRequestBody;
         const feedbackReport: FeedbackReport | null = await getReportById(Id);
         if (feedbackReport === null) {
             throw Error('Feedback report does not exist');
-        } else if (feedbackReport?.submitter._id != user._id) {
+        } else if (feedbackReport?.submitter._id !== user._id) {
             throw Error('Calling user is not owner of the report');
         } else {
             await deleteReport(Id);
