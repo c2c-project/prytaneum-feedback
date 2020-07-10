@@ -38,7 +38,7 @@ beforeAll(async () => {
 // Deletes all the feedback reports that were seeded in the beforeAll hook
 afterAll(async () => {
     await Collections.FeedbackReport().deleteOne({
-        description: 'I am a test',
+        submitterId: testUser1._id
     });
     await Collections.FeedbackReport().deleteOne({ _id: testReports[0]._id });
     await Collections.FeedbackReport().deleteOne({ _id: testReports[1]._id });
