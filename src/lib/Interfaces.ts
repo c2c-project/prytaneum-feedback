@@ -1,17 +1,10 @@
-interface Name {
-    first: string;
-    last: string;
-}
-
-export interface Submitter {
-    _id: string;
-    name: Name;
-}
+import { ObjectId } from 'mongodb';
 
 export interface Report {
+    _id?: ObjectId;
     date: string;
     description: string;
-    submitter: Submitter;
+    submitterId: string;
 }
 
 export interface User {

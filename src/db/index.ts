@@ -1,5 +1,5 @@
 import { Collection } from 'mongodb';
-import { FeedbackReport as FeedbackReportType } from 'lib/Interfaces';
+import { FeedbackReport as FeedbackReportType } from 'lib/interfaces';
 import { connectToMongo } from './mongo';
 import initFeedbackReports from './feedback-reports';
 
