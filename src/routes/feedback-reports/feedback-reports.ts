@@ -56,7 +56,9 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
         const { submitterId } = req.params;
         const { user } = req.body as GetReportsRequestBody;
         // If the id of the submitter does not match the id of the calling user then access to reports is denied
-        if (submitterId !== user._id) {
+        if (!submitterId) {
+            throw Error('Missing submitterId');
+        } else if (submitterId !== user._id) {
             throw Error('Calling user is not owner of the report');
         } else {
             const feedbackReports: FeedbackReport[] = await getReportBySubmitter(
@@ -83,10 +85,16 @@ router.post('/update-report', async (req: Request, res: Response) => {
             newDescription,
             user,
         } = req.body as UpdateReportRequestBody;
+        if (!Id || !newDescription || !user) {
+            throw Error('Missing fields in the body of the request');
+        }
+
+        // Look for feedback report that matches the Id provided
         const feedbackReport: FeedbackReport | null = await getReportById(Id);
+
         if (feedbackReport === null) {
             throw Error('Feedback report does not exist');
-        } else if (feedbackReport?.submitter._id !== user._id) {
+        } else if (feedbackReport.submitter._id !== user._id) {
             throw Error('Calling user is not owner of the report');
         } else {
             await updateReport(Id, newDescription);
@@ -108,10 +116,17 @@ interface DeleteReportRequestBody {
 router.post('/delete-report', async (req: Request, res: Response) => {
     try {
         const { Id, user } = req.body as DeleteReportRequestBody;
+
+        if (!Id) {
+            throw Error('Missing feedback report Id');
+        }
+
+        // Look for feedback report that matches the Id provided
         const feedbackReport: FeedbackReport | null = await getReportById(Id);
+
         if (feedbackReport === null) {
             throw Error('Feedback report does not exist');
-        } else if (feedbackReport?.submitter._id !== user._id) {
+        } else if (feedbackReport.submitter._id !== user._id) {
             throw Error('Calling user is not owner of the report');
         } else {
             await deleteReport(Id);

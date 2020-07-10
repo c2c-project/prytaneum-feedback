@@ -3,7 +3,7 @@ interface Name {
     last: string;
 }
 
-interface Submitter {
+export interface Submitter {
     _id: string;
     name: Name;
 }
@@ -15,7 +15,7 @@ export interface Report {
 }
 
 export interface User {
-    // TODO: Chane to mongoDb object ID if necessary in the future
+    // TODO: Change to mongoDb object ID if necessary in the future
     _id: string;
 }
 
