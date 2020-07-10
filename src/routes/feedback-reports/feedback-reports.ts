@@ -13,16 +13,20 @@ import {
 
 const router = express.Router();
 
+// TODO: When creating a report, instead of getting a submitter object, couldn't we use the user object that will come from the Authorization service
 router.post('/create-report', async (req: Request, res: Response) => {
     try {
         const feedbackReport = req.body as FeedbackReport;
         // TODO: ADD MORE VERBOSE VALIDATION
-        if (
-            !feedbackReport.date ||
-            !feedbackReport.description ||
-            !feedbackReport.submitter
+        if (!feedbackReport.date) {
+            throw Error('Missing date');
+        } else if (!feedbackReport.description) {
+            throw Error('Missing description');
+        } else if (
+            !feedbackReport.submitter ||
+            Object.keys(feedbackReport.submitter).length === 0
         ) {
-            throw Error('Missing fields in body of request');
+            throw Error('Missing submitter');
         } else {
             await createReport(feedbackReport);
             res.statusMessage = 'Feedback successfully submitted';

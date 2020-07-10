@@ -137,7 +137,18 @@ describe('/feedback-reports', () => {
                 });
             expect(status).toStrictEqual(404);
         });
+        it('should fail since feedback report submitter object is empty', async () => {
+            const { status } = await request(app)
+                .post('/feedback/create-report')
+                .send({
+                    date: new Date().toISOString(),
+                    description: 'I am a test',
+                    submitter: {},
+                });
+            expect(status).toStrictEqual(404);
+        });
         it('should pass since a valid feedback report is sent', async () => {
+            // TODO: Check if the email was sent?
             const { status } = await request(app)
                 .post('/feedback/create-report')
                 .send({
@@ -157,6 +168,10 @@ describe('/feedback-reports', () => {
     describe('/get-reports', () => {
         // TODO: Test by calling from Admin service. Expect a 200 status and an array of feedback reports
         // TODO: Test by calling from service that is not the Admin service. Expect a 404 status
+        it('should pass', async () => {
+            const { status } = await request(app).get('/feedback/get-reports');
+            expect(status).toStrictEqual(200);
+        });
     });
     describe('/get-reports/:submitterId', () => {
         it('should fail since user object is not sent', async () => {
@@ -182,7 +197,7 @@ describe('/feedback-reports', () => {
             expect(status).toStrictEqual(404);
         });
         it('should pass since calling user id and submitter id  match', async () => {
-            // TODO: Also compare the feedback reports that are sent?
+            // TODO: Also compare the feedback reports that are sent in the request?
             const { status } = await request(app)
                 .get(`/feedback/get-reports/${testSubmitter1._id}`)
                 .send({
