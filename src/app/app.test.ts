@@ -1,13 +1,13 @@
 import request from 'supertest';
 
 import { _test as EnvTest } from 'config/env';
-import connect from 'db/connect';
+import { connectToMongo } from 'db/mongo';
 import app, { _test as AppTest } from './app';
 
 const { env } = EnvTest;
 
 beforeAll(async () => {
-    await connect();
+    await connectToMongo();
 });
 
 describe('App', function () {

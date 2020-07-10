@@ -9,7 +9,7 @@ import {
     updateReport,
     getReportById,
     deleteReport,
-} from '../modules/feedback-reports';
+} from '../../modules/feedback-reports';
 
 const router = express.Router();
 
@@ -27,11 +27,12 @@ router.post('/create-report', async (req: Request, res: Response) => {
             await createReport(feedbackReport);
             res.statusMessage = 'Feedback successfully submitted';
             res.sendStatus(200);
+            // TODO: CALL SEND EMAIL MICRO SERVICE TO SEND EMAIL THANKING THE SUBMITTER FOR THE FEEDBACK
         }
     } catch (error) {
         log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';
-        res.sendStatus(400);
+        res.sendStatus(404);
     }
 });
 
@@ -43,7 +44,7 @@ router.get('/get-reports', async (req: Request, res: Response) => {
     } catch (error) {
         log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';
-        res.sendStatus(400);
+        res.sendStatus(404);
     }
 });
 
@@ -52,7 +53,6 @@ interface GetReportsRequestBody {
 }
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
-        // TODO: Find a way to give types to descructured objects
         const { submitterId } = req.params;
         const { user } = req.body as GetReportsRequestBody;
         // If the id of the submitter does not match the id of the calling user then access to reports is denied
@@ -67,7 +67,7 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     } catch (error) {
         log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';
-        res.sendStatus(400);
+        res.sendStatus(404);
     }
 });
 
@@ -96,7 +96,7 @@ router.post('/update-report', async (req: Request, res: Response) => {
     } catch (error) {
         log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';
-        res.sendStatus(400);
+        res.sendStatus(404);
     }
 });
 
@@ -121,7 +121,7 @@ router.post('/delete-report', async (req: Request, res: Response) => {
     } catch (error) {
         log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';
-        res.sendStatus(400);
+        res.sendStatus(404);
     }
 });
 
