@@ -2,7 +2,7 @@
 import app from 'app';
 import log from 'lib/log';
 import env from 'config/env';
-import { connect as connectToDb } from '../db';
+import { connect as connectToDb } from 'db';
 
 async function makeServer() {
     try {

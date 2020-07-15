@@ -15,3 +15,7 @@ export interface User {
 export interface FeedbackReport extends Report {
     // Add feedback report properties in the future
 }
+
+export interface BugReport extends Report {
+    townhallId: string
+}
