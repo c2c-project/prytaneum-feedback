@@ -21,16 +21,26 @@ export const createReport = (
     });
 };
 
-export const getReports = (): Promise<FeedbackReport[]> => {
-    return Collections.FeedbackReport().find().toArray();
+// We'll assume the limit is always 10 for now
+// If the page number exceeds the number of available pages, 0 reports are returned
+
+const numberOfDocumentsPerPage = 10;
+export const getReports = (page: number): Promise<FeedbackReport[]> => {
+    return (
+        Collections.FeedbackReport()
+            .find()
+            .sort({ date: -1 })
+            // If page is a negative number or undefined then we get the first page
+            .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
+            .limit(numberOfDocumentsPerPage)
+            .toArray()
+    );
 };
 
 export const getReportBySubmitter = (
     submitterId: string
 ): Promise<FeedbackReport[]> => {
-    return Collections.FeedbackReport()
-        .find({ submitterId })
-        .toArray();
+    return Collections.FeedbackReport().find({ submitterId }).toArray();
 };
 
 export const getReportById = (_id: string): Promise<FeedbackReport | null> => {

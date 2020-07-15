@@ -42,11 +42,15 @@ router.post('/create-report', async (req: Request, res: Response) => {
     }
 });
 
+interface GetReportsRequestQuery {
+    page: number;
+}
 // TODO: Add limit and pagination
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
-        const feedbackReports: FeedbackReport[] = await getReports();
+        const { page } = req.query as GetReportsRequestQuery;
+        const feedbackReports: FeedbackReport[] = await getReports(page);
         res.status(200).send({ reports: feedbackReports });
     } catch (error) {
         log.error(error);
