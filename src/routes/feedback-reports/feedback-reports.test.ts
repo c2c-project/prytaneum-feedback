@@ -462,7 +462,7 @@ describe('feedback-reports', () => {
                 });
             expect(status).toStrictEqual(400);
         });
-        it('should fail since unedfined user object is sent', async () => {
+        it('should fail since undefined user object is sent', async () => {
             const { status } = await request(app)
                 .post('/feedback/update-report')
                 .send({
