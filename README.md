@@ -146,7 +146,9 @@ Collection that stores bug reports of the form:
                     date: String, // UTC
                     townhallId: ObjectId // tentative
                     description: String,
-                    submitterId : ObjectId
+                    user : {
+                        _id: ObjectId
+                    }
                 }
             ```
         -   Response:
