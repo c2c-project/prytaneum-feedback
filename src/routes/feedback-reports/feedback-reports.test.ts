@@ -45,7 +45,7 @@ afterAll(async () => {
     await close();
 });
 
-describe('/feedback-reports', () => {
+describe('feedback-reports', () => {
     describe('/create-report', () => {
         it('should fail since feedback report data is not sent', async () => {
             const { status } = await request(app).post(
@@ -121,7 +121,7 @@ describe('/feedback-reports', () => {
                 });
             expect(status).toStrictEqual(200);
         });
-        it('should pass although with random string values in feedback report fields', async () => {
+        it('should pass although random string values are sent in feedback report fields', async () => {
             const { status } = await request(app)
                 .post('/feedback/create-report')
                 .send({
