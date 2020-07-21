@@ -48,6 +48,7 @@ export const getReportBySubmitter = (
 export const getReportById = (_id: string): Promise<BugReport | null> => {
     return Collections.BugReport().findOne({ _id: new ObjectId(_id) });
 };
+
 export const updateReport = (
     _id: string,
     newDescription: string

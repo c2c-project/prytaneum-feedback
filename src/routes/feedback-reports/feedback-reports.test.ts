@@ -110,6 +110,18 @@ describe('feedback-reports', () => {
                 });
             expect(status).toStrictEqual(400);
         });
+        it('should fail since user object does not have id', async () => {
+            const { status } = await request(app)
+                .post('/feedback/create-report')
+                .send({
+                    date: new Date().toISOString(),
+                    description: 'I am a test',
+                    user: {
+                        junk: '28tnvn84',
+                    },
+                });
+            expect(status).toStrictEqual(400);
+        });
         it('should pass since a valid feedback report is sent', async () => {
             // TODO: Check if the email was sent => Spy on the emit function on rabbitmq
             const { status } = await request(app)
@@ -631,6 +643,17 @@ describe('feedback-reports', () => {
                 .send({
                     _id: testReports[0]._id,
                     user: null,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since user object does not have id', async () => {
+            const { status } = await request(app)
+                .post('/feedback/delete-report')
+                .send({
+                    _id: testReports[0]._id,
+                    user: {
+                        junk: '2bfofc4',
+                    },
                 });
             expect(status).toStrictEqual(400);
         });

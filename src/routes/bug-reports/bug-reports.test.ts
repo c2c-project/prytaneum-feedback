@@ -36,7 +36,6 @@ beforeAll(async () => {
     await Collections.BugReport().insertMany(testReports);
 });
 
-// TODO: Add a better way to remove the report created from create-reports. For now, it is just finds the document from based on the description "I am a test"
 // Deletes all the bug reports that were seeded in the beforeAll hook
 afterAll(async () => {
     await Collections.BugReport().deleteMany({
@@ -134,6 +133,19 @@ describe('bug-reports', () => {
                     description: 'I am a test',
                     townhallId: new ObjectId(),
                     user: {},
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since user object does not have id', async () => {
+            const { status } = await request(app)
+                .post('/bugs/create-report')
+                .send({
+                    date: new Date().toISOString(),
+                    description: 'I am a test',
+                    townhallId: new ObjectId(),
+                    user: {
+                        junk: '2bfofc4',
+                    },
                 });
             expect(status).toStrictEqual(400);
         });
@@ -659,6 +671,17 @@ describe('bug-reports', () => {
                 .send({
                     _id: testReports[0]._id,
                     user: null,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since user object does not have id', async () => {
+            const { status } = await request(app)
+                .post('/bugs/delete-report')
+                .send({
+                    _id: testReports[0]._id,
+                    user: {
+                        junk: 'n57gb245',
+                    },
                 });
             expect(status).toStrictEqual(400);
         });
