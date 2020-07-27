@@ -1,12 +1,19 @@
 version: '3.8'
 services:
     service-base: # rename this to something like <yourservicename>-service
-        build: 
+        build:
             context: .
+            target: BASE_IMAGE
         volumes:
             - ./src:/usr/app/src
         ports:
             - '3000:3000'
+        volumes:
+            - ./src:/usr/app/src
+            - ./package.json:/usr/app/package.json
+            - ./yarn.lock:/usr/app/yarn.lock
+            - ./.babelrc:/usr/app/.babelrc
+            - ./.env:/usr/app/.env
         command: yarn test
         ###### uncomment below as appropriate
         # depends_on:
