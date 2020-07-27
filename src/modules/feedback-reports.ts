@@ -10,12 +10,12 @@ import Collections from 'db';
 import { FeedbackReport, User } from 'lib/interfaces';
 
 export const createReport = (
-    date: string,
+    date: string | Date,
     description: string,
     user: User
 ): Promise<InsertOneWriteOpResult<WithId<FeedbackReport>>> => {
     return Collections.FeedbackReport().insertOne({
-        date,
+        date: new Date(date),
         description,
         submitterId: user._id,
     });
@@ -25,11 +25,14 @@ export const createReport = (
 // If the page number exceeds the number of available pages, 0 reports are returned
 
 const numberOfDocumentsPerPage = 10;
-export const getReports = (page: number): Promise<FeedbackReport[]> => {
+export const getReports = (
+    page: number,
+    ascending: string
+): Promise<FeedbackReport[]> => {
     return (
         Collections.FeedbackReport()
             .find()
-            .sort({ date: -1 })
+            .sort({ date: ascending === 'true' ? 1 : -1 })
             // If page is a negative number or undefined then we get the first page
             .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
             .limit(numberOfDocumentsPerPage)

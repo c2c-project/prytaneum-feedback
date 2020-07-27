@@ -16,7 +16,7 @@ const router = express.Router();
 interface CreateReportRequest extends BugReport {
     user?: User;
 }
-// TODO: When creating a report, instead of getting a submitter object, couldn't we use the user object that will come from the Authorization service
+
 router.post('/create-report', async (req: Request, res: Response) => {
     try {
         const {
@@ -57,8 +57,14 @@ router.post('/create-report', async (req: Request, res: Response) => {
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
-        const { page } = req.query as { page: number };
-        const bugReports: BugReport[] = await getReports(page);
+        const { page, ascending } = req.query as {
+            page: number;
+            ascending: string;
+        };
+
+        console.log(ascending);
+
+        const bugReports: BugReport[] = await getReports(page, ascending);
         res.status(200).send({ reports: bugReports });
     } catch (error) {
         log.error(error);

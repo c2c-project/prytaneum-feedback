@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 
 export interface Report {
     _id?: ObjectId;
-    date: string;
+    date: Date | string;
     description: string;
     submitterId: string;
 }
@@ -17,5 +17,5 @@ export interface FeedbackReport extends Report {
 }
 
 export interface BugReport extends Report {
-    townhallId: string
+    townhallId: string;
 }

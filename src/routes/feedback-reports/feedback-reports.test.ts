@@ -258,6 +258,24 @@ describe('feedback-reports', () => {
             );
             expect(status).toStrictEqual(200);
         });
+        it('should pass since ascending parameter is true', async () => {
+            const { status } = await request(app).get(
+                '/feedback/get-reports?page=1&ascending=true'
+            );
+            expect(status).toStrictEqual(200);
+        });
+        it('should pass since ascending parameter is false', async () => {
+            const { status } = await request(app).get(
+                '/feedback/get-reports?page=1&ascending=false'
+            );
+            expect(status).toStrictEqual(200);
+        });
+        it('should pass since random value for ascending parameter gets converted to false', async () => {
+            const { status } = await request(app).get(
+                `/feedback/get-reports?page=1&ascending=${faker.random.word()}`
+            );
+            expect(status).toStrictEqual(200);
+        });
     });
     describe('/get-reports/:submitterId', () => {
         it('should fail since user object is not sent', async () => {
