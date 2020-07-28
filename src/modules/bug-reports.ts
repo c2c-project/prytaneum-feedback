@@ -13,8 +13,9 @@ import { BugReport, User } from 'lib/interfaces';
  * @description Creates a new bug report.
  * @param {string} date - Date when the bug report was concentrated at.
  * @param {string} description - Description of the bug report.
- * @param {string} townhallId - Id of the townhgll session where the bug occurred.
+ * @param {string} townhallId - Id of the townhall session where the bug occurred.
  * @param {Object} user - Represents the submitter of the bug report.
+ * @returns MongoDB promise
  */
 export const createReport = (
     date: string | Date,
@@ -80,7 +81,7 @@ export const getReportById = (_id: string): Promise<BugReport | null> => {
  * @description Updates the description of a bug report specified by its unique Id.
  * @param {string} _id - Id of the bug report to update.
  * @param {string} description - New description of the bug report.
- * @
+ * @returns MongoDB promise
  */
 export const updateReport = (
     _id: string,
@@ -95,7 +96,7 @@ export const updateReport = (
 /**
  * @description Deletes a bug report specified by its unique Id.
  * @param {string} _id - Id of the bug report to delete.
- * @
+ * @returns MongoDB promise
  */
 export const deleteReport = (
     _id: string

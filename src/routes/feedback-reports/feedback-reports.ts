@@ -16,7 +16,6 @@ const router = express.Router();
 interface CreateReportRequest extends FeedbackReport {
     user?: User;
 }
-// TODO: When creating a report, instead of getting a submitter object, couldn't we use the user object that will come from the Authorization service
 
 /**
  * @description Creates a feedback report and inserts it in the feedback-reports collection.
@@ -56,9 +55,15 @@ router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
         const { page, ascending } = req.query as {
-            page: number;
-            ascending: string;
+            page?: number;
+            ascending?: string;
         };
+        if (!page) {
+            throw Error('Missing page number');
+        }
+        if (!ascending) {
+            throw Error('Missing ascending');
+        }
         const feedbackReports: FeedbackReport[] = await getReports(
             page,
             ascending

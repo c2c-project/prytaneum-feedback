@@ -8,7 +8,6 @@ export interface Report {
 }
 
 export interface User {
-    // TODO: Change to mongoDb object ID if necessary in the future
     _id: string;
 }
 

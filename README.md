@@ -84,7 +84,7 @@ Collection that stores bug reports of the form:
     
     -  /get-reports/:submitterId
         - HTTP Method: Get
-        - Description: Retrieves all feedback reports created by a specific submitter
+        - Description: Retrieves all feedback reports submitted by a specific user
         - Permission needed: Calling user must posses the same Id as the one provided in the request parameters
         - Parameters of request: ID of submitter
         - Response:

@@ -35,8 +35,6 @@ beforeAll(async () => {
     await Collections.FeedbackReport().insertMany(testReports);
 });
 
-// TODO: Add a better way to remove the report created from create-reports. For now, it is just finds the document from based on the description "I am a test"
-// Deletes all the feedback reports that were seeded in the beforeAll hook
 afterAll(async () => {
     await Collections.FeedbackReport().deleteMany({
         submitterId: testUser1._id,

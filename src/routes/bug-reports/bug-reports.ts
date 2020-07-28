@@ -63,12 +63,15 @@ router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
         const { page, ascending } = req.query as {
-            page: number;
-            ascending: string;
+            page?: number;
+            ascending?: string;
         };
-
-        console.log(ascending);
-
+        if (!page) {
+            throw Error('Missing page number');
+        }
+        if (!ascending) {
+            throw Error('Missing ascending');
+        }
         const bugReports: BugReport[] = await getReports(page, ascending);
         res.status(200).send({ reports: bugReports });
     } catch (error) {

@@ -1,13 +1,16 @@
 {
     "name": "service-base",
     "version": "1.0.0",
-    "main": "index.js",
     "license": "MIT",
+    "main": "dist/index.js",
+    "types": "dist/index.js",
     "scripts": {
         "start": "nodemon -e ts,js,json --exec \"babel-node -x \".ts\" src\"",
         "test": "jest --watchAll --runInBand",
         "test:ci": "jest",
-        "build:types": "tsc --emitDeclarationOnly"
+        "build:types": "tsc --emitDeclarationOnly",
+        "build:app": "babel ./src -d ./dist --extensions \".ts\"",
+        "build": "yarn build:app && yarn build:types"
     },
     "devDependencies": {
         "@babel/cli": "^7.10.3",
