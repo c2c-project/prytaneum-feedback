@@ -8,6 +8,7 @@ services:
             - ./src:/usr/app/src
         ports:
             - '3000:3000'
+        command: yarn start
         volumes:
             - ./src:/usr/app/src
             - ./package.json:/usr/app/package.json
