@@ -9,6 +9,13 @@ import {
 import Collections from 'db';
 import { BugReport, User } from 'lib/interfaces';
 
+/**
+ * @description Creates a new bug report.
+ * @param {string} date - Date when the bug report was concentrated at.
+ * @param {string} description - Description of the bug report.
+ * @param {string} townhallId - Id of the townhgll session where the bug occurred.
+ * @param {Object} user - Represents the submitter of the bug report.
+ */
 export const createReport = (
     date: string | Date,
     description: string,
@@ -23,9 +30,13 @@ export const createReport = (
     });
 };
 
-// We'll assume the limit is always 10 for now
-// If the page number exceeds the number of available pages, 0 reports are returned
-
+/**
+ * @description Retrieves at most 10 reports from the bug-reports collection depending on the page number.
+ * @param {number} page - Page number to return. If the page number exceeds the number of available pages, 0 reports are returned.
+ * @param {string} ascending - Describes the sorted order of the reports.'True' for ascending. 'False' for descending. 
+ * @returns {Promise<BugReport[]>} - promise that will produce an array of bug reports.
+ * @
+ */
 const numberOfDocumentsPerPage = 10;
 export const getReports = (
     page: number,
@@ -42,16 +53,36 @@ export const getReports = (
     );
 };
 
+/**
+ * @description Retrieves bug reports from a specific submitter.
+ * @param {string} submitterId - Id of the submitter.
+ * @returns {Promise<BugReport[]>} - Promise that will produce an array of bug reports.
+ * @
+ */
 export const getReportBySubmitter = (
     submitterId: string
 ): Promise<BugReport[]> => {
     return Collections.BugReport().find({ submitterId }).toArray();
 };
 
+/**
+ * @description Retrieves at most one bug report specified by its unique Id.
+ * @param {string} _id -  Id of the bug report to return
+ * @returns {Promise<BugReport | null>} - Promise that will produce a bug report or null if no bug report was found in the collection.
+ * @
+ */
 export const getReportById = (_id: string): Promise<BugReport | null> => {
     return Collections.BugReport().findOne({ _id: new ObjectId(_id) });
 };
 
+
+// TODO: Check if adding no returns is fine for this type of function.
+/**
+ * @description Updates a bug report specified by its unique Id.
+ * @param {string} _id - Id of the bug report to update.
+ * @param {string} description - New description of the bug report.
+ * @
+ */
 export const updateReport = (
     _id: string,
     newDescription: string
@@ -62,6 +93,11 @@ export const updateReport = (
     );
 };
 
+/**
+ * @description Deletes a bug report specified by its unique Id.
+ * @param {string} _id - Id of the bug report to delete.
+ * @
+ */
 export const deleteReport = (
     _id: string
 ): Promise<DeleteWriteOpResultObject> => {
