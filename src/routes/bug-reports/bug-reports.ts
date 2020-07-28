@@ -17,6 +17,9 @@ interface CreateReportRequest extends BugReport {
     user?: User;
 }
 
+/**
+ * @description Creates a bug report and inserts it in the bugs-reports collection
+ * */
 router.post('/create-report', async (req: Request, res: Response) => {
     try {
         const {
@@ -53,7 +56,9 @@ router.post('/create-report', async (req: Request, res: Response) => {
     }
 });
 
-// TODO: Add limit and pagination
+/**
+ * @description Retrieves at most 10 reports from the bug-reports collection, depending on the page number provided. Calling user must be an Admin.
+ * */
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
@@ -76,7 +81,9 @@ router.get('/get-reports', async (req: Request, res: Response) => {
 interface UserRequestBody {
     user?: User;
 }
-
+/**
+ * @description Retrieves all bug reports submitted by a specific user. Calling user must have the same Id as the one provided in the request parameters
+ * */
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
         const { submitterId } = req.params as { submitterId: string };
@@ -104,6 +111,9 @@ interface UpdateReportRequestBody {
     newDescription: string;
     user?: User;
 }
+/**
+ * @description Updates the description of a specific report from the bug-reports collection.
+ * */
 router.post('/update-report', async (req: Request, res: Response) => {
     try {
         const {
@@ -149,6 +159,9 @@ interface DeleteReportRequestBody {
     user?: User;
 }
 
+/**
+ * @description Deletes a specific report from the bug-reports collection.
+ * */
 router.post('/delete-report', async (req: Request, res: Response) => {
     try {
         const { _id, user } = req.body as DeleteReportRequestBody;

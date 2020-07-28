@@ -17,6 +17,10 @@ interface CreateReportRequest extends FeedbackReport {
     user?: User;
 }
 // TODO: When creating a report, instead of getting a submitter object, couldn't we use the user object that will come from the Authorization service
+
+/**
+ * @description Creates a feedback report and inserts it in the feedback-reports collection.
+ * */
 router.post('/create-report', async (req: Request, res: Response) => {
     try {
         const { date, description, user } = req.body as CreateReportRequest;
@@ -45,6 +49,9 @@ router.post('/create-report', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * @description Retrieves at most 10 reports from the feedback-reports collection, depending on the page number provided. Calling user must be an Admin.
+ * */
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
@@ -68,6 +75,9 @@ interface UserRequestBody {
     user?: User;
 }
 
+/**
+ * @description Retrieves all feedback reports submitted by a specific user. Calling user must posses the same Id as the one provided in the request parameters.
+ * */
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
         const { submitterId } = req.params as { submitterId: string };
@@ -97,6 +107,10 @@ interface UpdateReportRequestBody {
     newDescription: string;
     user?: User;
 }
+
+/**
+ * @description Updates the description of a specific report from the feedback-reports collection.
+ * */
 router.post('/update-report', async (req: Request, res: Response) => {
     try {
         const {
@@ -142,6 +156,9 @@ interface DeleteReportRequestBody {
     user?: User;
 }
 
+/**
+ * @description Deletes a specific report from the feedback-reports collection.
+ * */
 router.post('/delete-report', async (req: Request, res: Response) => {
     try {
         const { _id, user } = req.body as DeleteReportRequestBody;

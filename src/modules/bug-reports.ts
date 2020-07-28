@@ -33,7 +33,7 @@ export const createReport = (
 /**
  * @description Retrieves at most 10 reports from the bug-reports collection depending on the page number.
  * @param {number} page - Page number to return. If the page number exceeds the number of available pages, 0 reports are returned.
- * @param {string} ascending - Describes the sorted order of the reports.'True' for ascending. 'False' for descending. 
+ * @param {string} ascending - Describes the sorted order of the reports.'True' for ascending. 'False' for descending.
  * @returns {Promise<BugReport[]>} - promise that will produce an array of bug reports.
  * @
  */
@@ -75,10 +75,9 @@ export const getReportById = (_id: string): Promise<BugReport | null> => {
     return Collections.BugReport().findOne({ _id: new ObjectId(_id) });
 };
 
-
 // TODO: Check if adding no returns is fine for this type of function.
 /**
- * @description Updates a bug report specified by its unique Id.
+ * @description Updates the description of a bug report specified by its unique Id.
  * @param {string} _id - Id of the bug report to update.
  * @param {string} description - New description of the bug report.
  * @

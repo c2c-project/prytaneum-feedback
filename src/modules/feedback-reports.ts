@@ -74,7 +74,7 @@ export const getReportById = (_id: string): Promise<FeedbackReport | null> => {
 
 // TODO: Check if adding no returns is fine for this type of function.
 /**
- * @description Updates a feedback report specified by its unique Id.
+ * @description Updates the description of a feedback report specified by its unique Id.
  * @param {string} _id - Id of the feedback report to update.
  * @param {string} description - New description of the feedback report.
  * @
