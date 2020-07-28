@@ -219,75 +219,75 @@ describe('bug-reports', () => {
     describe('/get-reports', () => {
         // TODO: Test by calling from Admin service. Expect a 200 status and an array of bug reports
         // TODO: Test by calling from service that is not the Admin service. Expect a 400 status
-        it('should pass although no page is provided', async () => {
+        it('should fail since page and ascending query parameters are not provided', async () => {
             const { status } = await request(app).get('/bugs/get-reports');
-            expect(status).toStrictEqual(200);
+            expect(status).toStrictEqual(400);
         });
-        it('should pass since zero page number zero returns first page', async () => {
-            const { status } = await request(app).get(
-                '/bugs/get-reports?page=0'
-            );
-            expect(status).toStrictEqual(200);
-        });
-        it('should pass since page is provided', async () => {
+        it('should fail since ascending query parameter is not provided', async () => {
             const { status } = await request(app).get(
                 '/bugs/get-reports?page=1'
+            );
+            expect(status).toStrictEqual(400);
+        });
+        it('should page zero gets converted to page 1', async () => {
+            const { status } = await request(app).get(
+                '/bugs/get-reports?page=0&ascending=true'
             );
             expect(status).toStrictEqual(200);
         });
         it('should pass since page number greater than current number of pages returns 0 bugs reports', async () => {
             const { status } = await request(app).get(
-                '/bugs/get-reports?page=2'
+                '/bugs/get-reports?page=2&ascending=true'
             );
             expect(status).toStrictEqual(200);
         });
         it('should pass since negative page number gets returns first page', async () => {
             const { status } = await request(app).get(
-                '/bugs/get-reports?page=-1'
+                '/bugs/get-reports?page=-1&ascending=true'
             );
             expect(status).toStrictEqual(200);
         });
         it('should pass since negative page number gets converted to page zero', async () => {
             const { status } = await request(app).get(
-                '/bugs/get-reports?page=-135423652764745672745741235'
+                '/bugs/get-reports?page=-135423652764745672745741235&ascending=false'
             );
             expect(status).toStrictEqual(200);
         });
         it('should fail since big positive page number is passed', async () => {
             const { status } = await request(app).get(
-                '/bugs/get-reports?page=135423652764745672745741235'
+                '/bugs/get-reports?page=135423652764745672745741235&ascending=true'
             );
             expect(status).toStrictEqual(400);
         });
         it('should fail since infinite positive page number is passed', async () => {
             const { status } = await request(app).get(
-                `/bugs/get-reports?page=${Number.POSITIVE_INFINITY}`
+                `/bugs/get-reports?page=${Number.POSITIVE_INFINITY}&ascending=true`
             );
             expect(status).toStrictEqual(400);
         });
         it('should pass since string for page number gets converted to page zero', async () => {
             const { status } = await request(app).get(
-                '/bugs/get-reports?page=@'
+                '/bugs/get-reports?page=@&ascending=true'
             );
             expect(status).toStrictEqual(200);
         });
         it('should pass since random long string for page number gets converted to page zero', async () => {
             const { status } = await request(app).get(
-                '/bugs/get-reports?page=vrtwerby456r5weyberwthy356456yertbgy53yb456yhnby'
+                '/bugs/get-reports?page=vrtwerby456r5weyberwthy356456yertbgy53yb456yhnby&ascending=true'
             );
             expect(status).toStrictEqual(200);
         });
         it('should pass since longer string for page number gets converted to page zero', async () => {
             const { status } = await request(app).get(
-                `/bugs/get-reports?page=${faker.lorem.paragraphs()}`
+                `/bugs/get-reports?page=${faker.lorem.paragraphs()}&ascending=true`
             );
             expect(status).toStrictEqual(200);
         });
-        it('should pass since empty page number gets converted to page zero', async () => {
+        it('should fail since empty page number is provided', async () => {
             const { status } = await request(app).get(
-                '/bugs/get-reports?page='
+                '/bugs/get-reports?page=&ascending=true'
             );
-            expect(status).toStrictEqual(200);
+            expect(status).toStrictEqual(400);
         });
         it('should pass since ascending parameter is true', async () => {
             const { status } = await request(app).get(
