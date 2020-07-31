@@ -1,5 +1,5 @@
 # MINIMAL DEV
-FROM node:14.5.0-slim as BASE_IMAGE
+FROM node:14.7.0-alpine as BASE_IMAGE
 WORKDIR /usr/app
 COPY package.json yarn.lock ./
 RUN apt-get update \
@@ -17,7 +17,7 @@ RUN yarn build \
     && yarn autoclean --force
 
 # PROD
-FROM node:14.5.0-slim
+FROM node:14.7.0-alpine
 WORKDIR /usr/app
 COPY --from=BUILD_IMAGE /usr/app/src/dist ./src/dist
 COPY --from=BUILD_IMAGE /usr/app/.env ./
