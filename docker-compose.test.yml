@@ -25,7 +25,7 @@ services:
     mongo:
         image: mongo:4.2.8-bionic
         ports:
-            - 27017:27017
+            - 27018:27018
     # postgresql:
     #     image: postgres:12.3
     # redis:
