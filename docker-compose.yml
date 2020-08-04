@@ -1,20 +1,31 @@
 version: '3.8'
 services:
-    feedback-portal: # rename this to something like <yourservicename>-service
-        build: .
+    feedback-portal:
+        build:
+            context: .
+            target: BASE_IMAGE
         volumes:
             - ./src:/usr/app/src
         ports:
             - '3000:3000'
+        command: yarn start
+        volumes:
+            - ./src:/usr/app/src
+            - ./package.json:/usr/app/package.json
+            - ./yarn.lock:/usr/app/yarn.lock
+            - ./.babelrc:/usr/app/.babelrc
+            - ./.env:/usr/app/.env
         ###### uncomment below as appropriate
-        # depends_on:
-        #     - mongo
+        depends_on:
+            - mongo
         #     - postgresql
         #     - rabbitmq
         #     - redis
     ###### uncomment the correponsing db's/services you need
-    # mongo:
-    #     image: mongo:4.2.8-bionic
+    mongo:
+        image: mongo:4.2.8-bionic
+        ports:
+            - 27017:27017
     # postgresql:
     #     image: postgres:12.3
     # redis:

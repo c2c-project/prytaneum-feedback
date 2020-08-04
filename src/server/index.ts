@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
 import app from 'app';
-import { connect } from 'db';
+import log from 'lib/log';
 import env from 'config/env';
+import { connect as connectToDb } from 'db';
 
 async function makeServer() {
     try {
@@ -8,13 +10,12 @@ async function makeServer() {
             this is so that we can guarantee we are connected to the db
             before the server exposes itself on a port
         */
-        await connect();
+        log.initStatus(['mongodb']);
+        await connectToDb();
         app.listen(Number(env.PORT), env.ORIGIN);
         console.log(`http://${env.ORIGIN}:${env.PORT}`);
     } catch (e) {
-        // eslint-disable-next-line no-console
         console.error(e);
-        // eslint-disable-next-line no-console
         console.log('Exiting...');
     }
 }

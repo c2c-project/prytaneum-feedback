@@ -19,16 +19,10 @@ Collection that stores feedback reports of the form:
 ​
 ```
     {
-        _id: ObjectID,
+        _id: ObjectId,
         date: String, // UTC
         description: String,
-        submitter : {
-            _id: ObjectID,
-            name: {
-                first: String,
-                last: String
-            }
-        }
+        submitterId: ObjectId
     }
 ```
 ​
@@ -39,17 +33,11 @@ Collection that stores bug reports of the form:
 ​
 ```
     {
-        _id: ObjectID,
+        _id: ObjectId,
         date: String, // UTC
-        townhallId: ObjectID // tentative
+        townhallId: ObjectId // tentative
         description: String,
-        submitter : {
-            _id: ObjectID,
-            name: {
-                first: String,
-                last: String
-            }
-        }
+        submitterId: ObjectId
     }
 ```
 ​
@@ -66,19 +54,15 @@ Collection that stores bug reports of the form:
                 {
                     date: String, // UTC
                     description: String,
-                    submitter : {
-                        _id: ObjectID,
-                        name: {
-                            first: String,
-                            last: String
-                        }
+                    user : {
+                        _id: ObjectId
                     }
                 }
             ```
         -   Response:
             -   status 200:
                 -   message: 'Feedback successfully submitted' 
-            -   status 404 :
+            -   status 400 :
                 -   message: 'Some error occurred. Please try again' 
 ​
     -   /get-reports
@@ -95,14 +79,12 @@ Collection that stores bug reports of the form:
                         reports: Array  // Array of feedback reports, possibly empty
                     }
                 ```
-            -   status 404 :
+            -   status 400 :
                 -   message: 'Some error occurred. Please try again' 
     
-​
-​
     -  /get-reports/:submitterId
         - HTTP Method: Get
-        - Description: Retrieves all feedback reports created by a specific submitter
+        - Description: Retrieves all feedback reports submitted by a specific user
         - Permission needed: Calling user must posses the same Id as the one provided in the request parameters
         - Parameters of request: ID of submitter
         - Response:
@@ -113,7 +95,7 @@ Collection that stores bug reports of the form:
                         reports: Array  // Array of feedback reports from the specified submitter, possibly empty
                     }
                 ```
-            -   status 404 :
+            -   status 400 :
                 -   message: 'Some error occurred. Please try again' 
 ​
 ​
@@ -124,14 +106,14 @@ Collection that stores bug reports of the form:
         - Body of request:
             ```
                 {
-                    Id : ObjectId // Id of the report to update
+                    _id : ObjectId // Id of the report to update
                     newDescription: String // New description of the specified feedback report
                 }
             ```
         - Response:
             - status 200 :
                 - message: 'Feedback report successfully updated'
-            - status 404 :
+            - status 400 :
                 - message: 'Some error occurred. Please try again'
 ​
 ​
@@ -142,13 +124,13 @@ Collection that stores bug reports of the form:
         - Body of request:
             ```
                 {
-                    Id : ObjectId // Id of the report to delete
+                    _id : ObjectId // Id of the report to delete
                 }
             ```
         - Response:
             - status 200 :
                 - message: 'Feedback report successfully deleted'
-            - status 404 :
+            - status 400 :
                 - message: 'Some error occurred. Please try again'
 ​
 ​
@@ -162,21 +144,17 @@ Collection that stores bug reports of the form:
             ```
                 {
                     date: String, // UTC
-                    townhallId: ObjectID // tentative
+                    townhallId: ObjectId // tentative
                     description: String,
-                    submitter : {
-                        _id: ObjectID,
-                        name: {
-                            first: String,
-                            last: String
-                        }
+                    user : {
+                        _id: ObjectId
                     }
                 }
             ```
         -   Response:
             -   status 200 :
                 -   message: 'Bug report successfully submitted'
-            -   status 404 :
+            -   status 400 :
                 -   message: 'Some error occurred. Please try again'
 ​
 ​
@@ -194,7 +172,7 @@ Collection that stores bug reports of the form:
                         reports: Array  // Array of bug reports, possibly empty
                     }
                 ```
-            -   status 404 :
+            -   status 400 :
                 -   message: 'Some error occurred. Please try again' 
            
     -  /get-reports/:submitterId
@@ -210,7 +188,7 @@ Collection that stores bug reports of the form:
                         reports: Array  // Array of bug reports from the specified submitter, possibly empty
                     }
                 ```
-            -   status 404 :
+            -   status 400 :
                 -   message: 'Some error occurred. Please try again' 
             
     -  /update-report
@@ -220,14 +198,14 @@ Collection that stores bug reports of the form:
         - Body of request:
             ```
                 {
-                    Id : ObjectId // Id of the report to update
+                    _id : ObjectId // Id of the report to update
                     newDescription: String // New description of the specified bug report
                 }
             ```
         - Response:
             - status 200 :
                 - message: 'Bug report successfully updated'
-            - status 404 :
+            - status 400 :
                 - message: 'Some error occurred. Please try again'
 ​
     -  /delete-report
@@ -237,11 +215,11 @@ Collection that stores bug reports of the form:
         - Body of request:
             ```
                 {
-                    Id : ObjectId // Id of the report to delete
+                    _id : ObjectId // Id of the report to delete
                 }
             ```
         - Response:
             - status 200 :
                 - message: 'Bug report successfully deleted'
-            - status 404 :
+            - status 400 :
                 - message: 'Some error occurred. Please try again'
