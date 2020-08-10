@@ -55,15 +55,22 @@ export const getReports = (
 };
 
 /**
- * @description Retrieves bug reports from a specific submitter.
- * @param {string} submitterId - Id of the submitter.
+ * @description Retrieves at most 10  bug reports from a specific submitter, depending on the page number.
+ * @param {number} page - Page number to return. If the page number exceeds the number of available pages, 0 reports are returned.
+ * @param {string} ascending - Describes the sorted order of the reports.'True' for ascending. 'False' for descending.
  * @returns {Promise<BugReport[]>} - Promise that will produce an array of bug reports.
- * @
  */
 export const getReportBySubmitter = (
+    page: number,
+    ascending: string,
     submitterId: string
 ): Promise<BugReport[]> => {
-    return Collections.BugReport().find({ submitterId }).toArray();
+    return Collections.BugReport()
+        .find({ submitterId })
+        .sort({ date: ascending === 'true' ? 1 : -1 })
+        .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
+        .limit(numberOfDocumentsPerPage)
+        .toArray();
 };
 
 /**

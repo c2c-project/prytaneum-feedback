@@ -91,6 +91,10 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
         const { submitterId } = req.params as { submitterId: string };
         const { user } = req.body as UserRequestBody;
+        const { page, ascending } = req.query as {
+            page?: number;
+            ascending?: string;
+        };
         if (!user) {
             throw Error('Missing user object');
         }
@@ -100,7 +104,17 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
         if (submitterId !== user._id) {
             throw Error('Calling user is not owner of the report');
         }
-        const bugReports: BugReport[] = await getReportBySubmitter(submitterId);
+        if (!page) {
+            throw Error('Missing page number');
+        }
+        if (!ascending) {
+            throw Error('Missing ascending');
+        }
+        const bugReports: BugReport[] = await getReportBySubmitter(
+            page,
+            ascending,
+            submitterId
+        );
         res.status(200).send({ reports: bugReports });
     } catch (error) {
         log.error(error);

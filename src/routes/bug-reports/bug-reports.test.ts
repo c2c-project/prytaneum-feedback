@@ -338,7 +338,7 @@ describe('bug-reports', () => {
         });
         it('should pass since random submitter ids match but do not belong to any bugs report', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${Number.MAX_VALUE}`)
+                .get(`${endpoint}/${Number.MAX_VALUE}?page=1&ascending=true`)
                 .send({
                     user: {
                         _id: Number.MAX_VALUE.toString(),
@@ -358,11 +358,27 @@ describe('bug-reports', () => {
         });
         it('should pass since calling user id and submitter id  match', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}`)
+                .get(`${endpoint}/${testUser1._id}?page=1&ascending=false`)
                 .send({
                     user: testUser1,
                 });
             expect(status).toStrictEqual(200);
+        });
+        it('should fail since ascending query parameter is not sent', async () => {
+            const { status } = await request(app)
+                .get(`${endpoint}/${testUser1._id}?page=1`)
+                .send({
+                    user: testUser1,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since page query parameter is not sent', async () => {
+            const { status } = await request(app)
+                .get(`${endpoint}/${testUser1._id}?ascending=false`)
+                .send({
+                    user: testUser1,
+                });
+            expect(status).toStrictEqual(400);
         });
     });
     describe('/update-report', () => {

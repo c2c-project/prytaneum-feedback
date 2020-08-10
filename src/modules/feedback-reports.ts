@@ -51,14 +51,23 @@ export const getReports = (
 };
 
 /**
- * @description Retrieves feedback reports from a specific submitter.
+ * @description Retrieves at most 10  feedback reports from a specific submitter, depending on the page number.
+ * @param {number} page - Page number to return. If the page number exceeds the number of available pages, 0 reports are returned.
+ * @param {string} ascending - Describes the sorted order of the reports.'True' for ascending. 'False' for descending.
  * @param {string} submitterId - Id of the submitter.
  * @returns {Promise<FeedbackReport[]>} - Promise that will produce an array of feedback reports.
  */
 export const getReportBySubmitter = (
+    page: number,
+    ascending: string,
     submitterId: string
 ): Promise<FeedbackReport[]> => {
-    return Collections.FeedbackReport().find({ submitterId }).toArray();
+    return Collections.FeedbackReport()
+        .find({ submitterId })
+        .sort({ date: ascending === 'true' ? 1 : -1 })
+        .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
+        .limit(numberOfDocumentsPerPage)
+        .toArray();
 };
 
 /**
