@@ -106,3 +106,22 @@ export const deleteReport = (
 ): Promise<DeleteWriteOpResultObject> => {
     return Collections.FeedbackReport().deleteOne({ _id: new ObjectId(_id) });
 };
+
+/**
+ * @description Returns the total count of reports in the feedback-reports collection
+ * @returns total count of feedback reports
+ */
+export const getNumberOfFeedbackReports = (): Promise<number> => {
+    return Collections.FeedbackReport().countDocuments();
+};
+
+/**
+ * @description Returns the count of feedback reports submitted by a specific user
+ * @param {string} submitterId - Id of user
+ * @returns count of feedback reports
+ */
+export const getNumberOfFeedbackReportsBySubmitter = (
+    submitterId: string
+): Promise<number> => {
+    return Collections.FeedbackReport().countDocuments({ submitterId });
+};

@@ -9,6 +9,8 @@ import {
     updateReport,
     getReportById,
     deleteReport,
+    getNumberOfFeedbackReports,
+    getNumberOfFeedbackReportsBySubmitter,
 } from '../../modules/feedback-reports';
 
 const router = express.Router();
@@ -68,7 +70,13 @@ router.get('/get-reports', async (req: Request, res: Response) => {
             page,
             ascending
         );
-        res.status(200).send({ reports: feedbackReports });
+
+        const countOfReports = await getNumberOfFeedbackReports();
+
+        res.status(200).send({
+            reports: feedbackReports,
+            count: countOfReports,
+        });
     } catch (error) {
         log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';
@@ -112,7 +120,15 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
             ascending,
             submitterId
         );
-        res.status(200).send({ reports: feedbackReports });
+
+        const countOfReports = await getNumberOfFeedbackReportsBySubmitter(
+            submitterId
+        );
+
+        res.status(200).send({
+            reports: feedbackReports,
+            count: countOfReports,
+        });
     } catch (error) {
         log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';

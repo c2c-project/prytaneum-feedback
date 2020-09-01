@@ -9,6 +9,8 @@ import {
     updateReport,
     getReportById,
     deleteReport,
+    getNumberOfBugReports,
+    getNumberOfBugReportsBySubmitter,
 } from '../../modules/bug-reports';
 
 const router = express.Router();
@@ -73,7 +75,8 @@ router.get('/get-reports', async (req: Request, res: Response) => {
             throw Error('Missing ascending');
         }
         const bugReports: BugReport[] = await getReports(page, ascending);
-        res.status(200).send({ reports: bugReports });
+        const countOfReports = await getNumberOfBugReports();
+        res.status(200).send({ reports: bugReports, count: countOfReports });
     } catch (error) {
         log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';
@@ -115,7 +118,10 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
             ascending,
             submitterId
         );
-        res.status(200).send({ reports: bugReports });
+        const countOfReports = await getNumberOfBugReportsBySubmitter(
+            submitterId
+        );
+        res.status(200).send({ reports: bugReports, count: countOfReports });
     } catch (error) {
         log.error(error);
         res.statusMessage = 'Some error occurred. Please try again';

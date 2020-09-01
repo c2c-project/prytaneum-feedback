@@ -110,3 +110,22 @@ export const deleteReport = (
 ): Promise<DeleteWriteOpResultObject> => {
     return Collections.BugReport().deleteOne({ _id: new ObjectId(_id) });
 };
+
+/**
+ * @description Returns the total count of reports in the bug-reports collection
+ * @returns total count of bug reports
+ */
+export const getNumberOfBugReports = (): Promise<number> => {
+    return Collections.BugReport().countDocuments();
+};
+
+/**
+ * @description Returns the count of bug reports submitted by a specific user
+ * @param {string} submitterId - Id of user
+ * @returns count of bug reports
+ */
+export const getNumberOfBugReportsBySubmitter = (
+    submitterId: string
+): Promise<number> => {
+    return Collections.BugReport().countDocuments({ submitterId });
+};
