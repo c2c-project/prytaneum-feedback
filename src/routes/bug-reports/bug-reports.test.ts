@@ -231,11 +231,11 @@ describe('bug-reports', () => {
             );
             expect(status).toStrictEqual(400);
         });
-        it('should fail since infinite positive page number is passed', async () => {
+        it('should pass since infinite positive page number gets converted to page zero', async () => {
             const { status } = await request(app).get(
                 `${endpoint}?page=${Number.POSITIVE_INFINITY}&ascending=true`
             );
-            expect(status).toStrictEqual(400);
+            expect(status).toStrictEqual(200);
         });
         it('should pass since string for page number gets converted to page zero', async () => {
             const { status } = await request(app).get(

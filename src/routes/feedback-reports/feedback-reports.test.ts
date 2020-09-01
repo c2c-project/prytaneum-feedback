@@ -196,15 +196,15 @@ describe('feedback-reports', () => {
         });
         it('should fail since big positive page number is passed', async () => {
             const { status } = await request(app).get(
-                `${endpoint}?page=135423652764745672745741235`
+                `${endpoint}?page=135423652764745672745741235&ascending=false`
             );
             expect(status).toStrictEqual(400);
         });
-        it('should fail since infinite page number is passed', async () => {
+        it('should pass since infinite page number is converted to page zero', async () => {
             const { status } = await request(app).get(
-                `${endpoint}?page=${Number.POSITIVE_INFINITY}`
+                `${endpoint}?page=${Number.POSITIVE_INFINITY}&ascending=true`
             );
-            expect(status).toStrictEqual(400);
+            expect(status).toStrictEqual(200);
         });
         it('should pass since string for page number gets converted to page zero', async () => {
             const { status } = await request(app).get(
