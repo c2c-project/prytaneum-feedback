@@ -20,8 +20,14 @@ interface CreateReportRequest extends FeedbackReport {
 }
 
 /**
- * @description Creates a feedback report and inserts it in the feedback-reports collection.
- * */
+ * @description Creates a new feedback report and inserts it in the feedback-reports collection.
+ * @param {Object} Request.body
+ * @param {string} Request.body.date - Date when report is created
+ * @param {string} Request.body.description - Description of the report
+ * @param {Object} Request.body.user - User that submits the report
+ * @param {string} Request.body.user._id - Id of the user
+ * @returns {Object} Response
+ */
 router.post('/create-report', async (req: Request, res: Response) => {
     try {
         const { date, description, user } = req.body as CreateReportRequest;
@@ -51,15 +57,22 @@ router.post('/create-report', async (req: Request, res: Response) => {
 });
 
 /**
- * @description Retrieves at most 10 reports from the feedback-reports collection, depending on the page number provided. Calling user must be an Admin.
- * */
+ * @description Retrieves at most 10 reports from the feedback-reports collection, depending on the page number provided. Calling user must have admin permission.
+ * @param {Object} Request.query
+ * @param {string} Request.query.page - Number of page of reports to retrieve
+ * @param {string} Request.query.ascending - Sort by date order. Either 'true' or 'false'
+ * @returns {Object} Response
+ * @returns {FeedbackReport[]} Response.reports - Array of reports retrieved from the collection
+ * @returns {number} Response.count - Total count of reports in the collection
+ */
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
         const { page, ascending } = req.query as {
-            page?: number;
+            page?: string;
             ascending?: string;
         };
+
         if (!page) {
             throw Error('Missing page number');
         }
@@ -67,7 +80,7 @@ router.get('/get-reports', async (req: Request, res: Response) => {
             throw Error('Missing ascending');
         }
         const feedbackReports: FeedbackReport[] = await getReports(
-            page,
+            parseInt(page, 10),
             ascending
         );
 
@@ -89,14 +102,23 @@ interface UserRequestBody {
 }
 
 /**
- * @description Retrieves all feedback reports submitted by a specific user. Calling user must posses the same Id as the one provided in the request parameters.
- * */
+ * @description Retrieves all feedback reports submitted by a specific user. Calling user must have the same Id as the one provided in the request parameters
+ * @param {Object} Request
+ * @param {string} Request.params.submitterId - Id of submitter
+ * @param {string} Request.query.page - Number of page of reports to retrieve
+ * @param {string} Request.query.ascending - Sort by date order. Either 'true' or 'false'
+ * @param {Object} Request.body.user - User that submits the report
+ * @param {string} Request.body.user._id - Id of the user
+ * @returns {Object} Response
+ * @returns {FeedbackReport[]} Response.reports - Array of reports submitted by the user retrieved from the collection
+ * @returns {number} Response.count -  Total count of reports submitted by the user in the collection
+ */
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
         const { submitterId } = req.params as { submitterId: string };
         const { user } = req.body as UserRequestBody;
         const { page, ascending } = req.query as {
-            page?: number;
+            page?: string;
             ascending?: string;
         };
 
@@ -116,7 +138,7 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
             throw Error('Missing ascending');
         }
         const feedbackReports: FeedbackReport[] = await getReportBySubmitter(
-            page,
+            parseInt(page, 10),
             ascending,
             submitterId
         );
@@ -144,7 +166,14 @@ interface UpdateReportRequestBody {
 
 /**
  * @description Updates the description of a specific report from the feedback-reports collection.
- * */
+ * @param {Object} Request.body
+ * @param {string} Request.body._id - Id of report to update 
+ * @param {string} Request.body.newDescription - new description of the report
+ * @param {Object} Request.body.user - User that requests the update
+ * @param {string} Request.body.user._id - Id of the user
+ * @returns {Object} Response
+ */
+
 router.post('/update-report', async (req: Request, res: Response) => {
     try {
         const {
@@ -166,7 +195,6 @@ router.post('/update-report', async (req: Request, res: Response) => {
             throw Error('Missing user Id');
         }
 
-        // Look for feedback report that matches the Id provided
         const feedbackReport: FeedbackReport | null = await getReportById(_id);
 
         if (feedbackReport === null) {
@@ -192,6 +220,11 @@ interface DeleteReportRequestBody {
 
 /**
  * @description Deletes a specific report from the feedback-reports collection.
+ * @param {Object} Request.body
+ * @param {string} Request.body._id - Id of the report to delete
+ * @param {Object} Request.body.user - User that requests the delete 
+ * @param {string} Request.body.user._id - Id of the user
+ * @returns {Object} Response
  * */
 router.post('/delete-report', async (req: Request, res: Response) => {
     try {
@@ -206,7 +239,7 @@ router.post('/delete-report', async (req: Request, res: Response) => {
         if (!user._id) {
             throw Error('Missing user Id');
         }
-        // Look for feedback report that matches the Id provided
+
         const feedbackReport: FeedbackReport | null = await getReportById(_id);
 
         if (feedbackReport === null) {

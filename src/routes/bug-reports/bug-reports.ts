@@ -20,7 +20,14 @@ interface CreateReportRequest extends BugReport {
 }
 
 /**
- * @description Creates a bug report and inserts it in the bugs-reports collection
+ * @description Creates a new bug report and inserts it in the bugs-reports collection
+ * @param {Object} Request.body
+ * @param {string} Request.body.date - Date when report is created
+ * @param {string} Request.body.description - Description of the report
+ * @param {string} Request.body.townhallId - Id of townhall where bug was encountered
+ * @param {Object} Request.body.user - User that submits the report
+ * @param {string} Request.body.user._id - Id of the user
+ * @returns {Object} Response
  * */
 router.post('/create-report', async (req: Request, res: Response) => {
     try {
@@ -59,13 +66,19 @@ router.post('/create-report', async (req: Request, res: Response) => {
 });
 
 /**
- * @description Retrieves at most 10 reports from the bug-reports collection, depending on the page number provided. Calling user must be an Admin.
- * */
+ * @description Retrieves at most 10 reports from the bug-reports collection, depending on the page number provided. Calling user must be have admin permission.
+ * @param {Object} Request.query
+ * @param {string} Request.query.page - Number of page of reports to retrieve
+ * @param {string} Request.query.ascending - Sort by date order. Either 'true' or 'false'
+ * @returns {Object} Response
+ * @returns {BugReport[]} Response.reports - Array of reports retrieved from the collection
+ * @returns {number} Response.count - Total count of reports in the collection
+ */
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
         const { page, ascending } = req.query as {
-            page?: number;
+            page?: string;
             ascending?: string;
         };
         if (!page) {
@@ -74,7 +87,10 @@ router.get('/get-reports', async (req: Request, res: Response) => {
         if (!ascending) {
             throw Error('Missing ascending');
         }
-        const bugReports: BugReport[] = await getReports(page, ascending);
+        const bugReports: BugReport[] = await getReports(
+            parseInt(page, 10),
+            ascending
+        );
         const countOfReports = await getNumberOfBugReports();
         res.status(200).send({ reports: bugReports, count: countOfReports });
     } catch (error) {
@@ -89,13 +105,22 @@ interface UserRequestBody {
 }
 /**
  * @description Retrieves all bug reports submitted by a specific user. Calling user must have the same Id as the one provided in the request parameters
- * */
+ * @param {Object} Request
+ * @param {string} Request.params.submitterId - Id of submitter
+ * @param {string} Request.query.page - Number of page of reports to retrieve
+ * @param {string} Request.query.ascending - Sort by date order. Either 'true' or 'false'
+ * @param {Object} Request.body.user - User that submits the report
+ * @param {string} Request.body.user._id - Id of the user
+ * @returns {Object} Response
+ * @returns {BugReport[]} Response.reports - Array of reports submitted by the user retrieved from the collection
+ * @returns {number} Response.count -  Total count of reports submitted by the user in the collection
+ */
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
         const { submitterId } = req.params as { submitterId: string };
         const { user } = req.body as UserRequestBody;
         const { page, ascending } = req.query as {
-            page?: number;
+            page?: string;
             ascending?: string;
         };
         if (!user) {
@@ -114,7 +139,7 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
             throw Error('Missing ascending');
         }
         const bugReports: BugReport[] = await getReportBySubmitter(
-            page,
+            parseInt(page, 10),
             ascending,
             submitterId
         );
@@ -136,6 +161,12 @@ interface UpdateReportRequestBody {
 }
 /**
  * @description Updates the description of a specific report from the bug-reports collection.
+ * @param {Object} Request.body
+ * @param {string} Request.body._id - Id of report to update
+ * @param {string} Request.body.newDescription - new description of the report
+ * @param {Object} Request.body.user - User that requests the update
+ * @param {string} Request.body.user._id - Id of the user
+ * @returns {Object} Response
  * */
 router.post('/update-report', async (req: Request, res: Response) => {
     try {
@@ -184,6 +215,11 @@ interface DeleteReportRequestBody {
 
 /**
  * @description Deletes a specific report from the bug-reports collection.
+ * @param {Object} Request.body
+ * @param {string} Request.body._id - Id of the report to delete
+ * @param {Object} Request.body.user - User that requests the delete
+ * @param {string} Request.body.user._id - Id of the user
+ * @returns {Object} Response
  * */
 router.post('/delete-report', async (req: Request, res: Response) => {
     try {
