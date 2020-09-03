@@ -50,15 +50,15 @@ Collection that stores bug reports of the form:
         -   Description: Creates a report and inserts it in the feedback-reports collection
         -   Permission needed: regular user
         -   Body of request:
-            ```
-                {
-                    date: String, // UTC
-                    description: String,
-                    user : {
-                        _id: ObjectId
+                ```
+                    {
+                        date: String, // UTC
+                        description: String,
+                        user : {
+                            _id: ObjectId
+                        }
                     }
-                }
-            ```
+                ```
         -   Response:
             -   status 200:
                 -   message: 'Feedback successfully submitted' 
@@ -71,21 +71,21 @@ Collection that stores bug reports of the form:
         -   Description: Retrieves at most 10 reports from the feedback-reports collection, depending on the page number provided
         -   Permission needed: Admin user
         -   Query Parameters:
-        ```
-            {
-                page: Number // Page number of reports
-                ascending: 'true' | 'false' // Sort by date order
-            }
-        ```
+            ```
+                {
+                    page: Number // Page number of reports
+                    ascending: 'true' | 'false' // Sort by date order
+                }
+            ```
         -   Response:
             -   status 200:
                 - data :
-                ```
-                    {
-                        reports: Array  // Array of feedback reports, possibly empty
-                        count: Number   // Total count of feedback reports in the collection
-                    }
-                ```
+                    ```
+                        {
+                            reports: Array  // Array of feedback reports, possibly empty
+                            count: Number   // Total count of feedback reports in the collection
+                        }
+                    ```
             -   status 400 :
                 -   message: 'Some error occurred. Please try again' 
     
@@ -94,18 +94,18 @@ Collection that stores bug reports of the form:
         - Description: Retrieves at most 10 feedback reports submitted by a specific user, depending on the page number provided
         - Permission needed: Calling user must posses the same Id as the one provided in the request parameters
         - Query Parameters:
-        ```
-            {
-                page: Number // Page number of reports
-                ascending: 'true' | 'false' // Sort by date order
-            }
-        ```
+            ```
+                {
+                    page: Number // Page number of reports
+                    ascending: 'true' | 'false' // Sort by date order
+                }
+            ```
         - Parameters:
-        ```
-            {
-                submitterId: ObjectId
-            }
-        ```
+            ```
+                {
+                    submitterId: ObjectId
+                }
+            ```
         - Response:
             -   status 200:
                 - data :
@@ -152,6 +152,28 @@ Collection that stores bug reports of the form:
                 - message: 'Feedback report successfully deleted'
             - status 400 :
                 - message: 'Some error occurred. Please try again'
+    
+    -  /updateResolvedStatus/:_id
+        - HTTP Method: POST
+        - Description: Marks a bug report as resolved or unresolved
+        - Permission needed: Admin user
+        - Parameters:
+            ```
+                {
+                    _id: ObjectId // Id of report to update its resolvedStatus
+                }
+            ```
+        - Body of request:
+            ```
+                {
+                    resolvedStatus : "true" | "false" //  Value used to set the resolvedStatus of the report. "true" for resolved. "false" for unresolved
+                }
+            ```
+        - Response:
+            - status 200 :
+                - message: 'Resolved status successfully updated'
+            - status 400 :
+                - message: 'Some error occurred. Please try again'
 ​
 ​
 -   /bugs
@@ -160,6 +182,12 @@ Collection that stores bug reports of the form:
         -   HTTP Method: Post
         -   Description: Creates a report and inserts it in the bugs-reports collection
         -   Permission needed: Regular user
+        -  Parameters:
+            ```
+                {
+                    submitterId: ObjectId
+                }
+            ```
         -   Body of request:
             ```
                 {
@@ -184,21 +212,21 @@ Collection that stores bug reports of the form:
         -   Description: Retrieves at most 10 reports from the bug-reports collection, depending on the page number
         -   Permission needed: Admin user
         -   Query Parameters:
-        ```
-            {
-                page: Number // Page number of reports
-                ascending: 'true' | 'false' // Sort by date order
-            }
-        ```
+            ```
+                {
+                    page: Number // Page number of reports
+                    ascending: 'true' | 'false' // Sort by date order
+                }
+            ```
         -   Response:
             -   status 200:
                 - data :
-                ```
-                    {
-                        reports: Array // Array of bug reports, possibly empty
-                        count: Number  // Total count of bug reports in the collection
-                    }
-                ```
+                    ```
+                        {
+                            reports: Array // Array of bug reports, possibly empty
+                            count: Number  // Total count of bug reports in the collection
+                        }
+                    ```
             -   status 400 :
                 -   message: 'Some error occurred. Please try again' 
            
@@ -207,27 +235,27 @@ Collection that stores bug reports of the form:
         - Description: Retrieves at most 10 bug reports created by a specific user, depending on the page number
         - Permission needed: Calling user must have the same Id as the one provided in the request parameters
         - Query Parameters:
-        ```
-            {
-                page: Number // Page number of reports
-                ascending: 'true' | 'false' // Sort by date order 
-            }
-        ```
+            ```
+                {
+                    page: Number // Page number of reports
+                    ascending: 'true' | 'false' // Sort by date order 
+                }
+            ```
         - Parameters:
-        ```
-            {
-                submitterId: ObjectId
-            }
-        ```
+            ```
+                {
+                    submitterId: ObjectId
+                }
+            ```
         - Response:
             -   status 200:
                 - data :
-                ```
-                    {
-                        reports: Array // Array of bug reports from the specified submitter, possibly empty
-                        count: Number  // Number of bug reports by the user
-                    }
-                ```
+                    ```
+                        {
+                            reports: Array // Array of bug reports from the specified submitter, possibly empty
+                            count: Number  // Number of bug reports by the user
+                        }
+                    ```
             -   status 400 :
                 -   message: 'Some error occurred. Please try again' 
             

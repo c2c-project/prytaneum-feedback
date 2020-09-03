@@ -259,7 +259,7 @@ router.post('/delete-report', async (req: Request, res: Response) => {
  * @param {Object} Request.params
  * @param {string} Request.params._id - Id of the report to mark as resolved
  * @param {Object} Request.body.user - User that requests the delete
- * @param {"true" | "false"} Request.body.resolvedStatus - value used to set the resolvedStatus of the report. "true" for resolved. "false" for unresolved
+ * @param {"true" | "false"} Request.body.resolvedStatus - Value used to set the resolvedStatus of the report. "true" for resolved. "false" for unresolved
  * @returns {Object} Response
  * */
 // TODO: This endpoint only works for admin users
