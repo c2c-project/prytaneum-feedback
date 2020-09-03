@@ -5,7 +5,7 @@ export interface Report {
     date: Date | string;
     description: string;
     submitterId: string;
-    resolved: boolean;
+    resolved?: boolean;
 }
 
 export interface User {

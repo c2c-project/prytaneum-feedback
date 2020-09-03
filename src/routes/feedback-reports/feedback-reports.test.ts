@@ -1,20 +1,19 @@
 import { ObjectId } from 'mongodb';
 
 import Collections, { connect, close } from 'db';
-import { FeedbackReport, User } from 'lib/interfaces';
 import faker from 'faker';
 import request from 'supertest';
 import app from 'app';
 
-const testUser1: User = {
+const testUser1 = {
     _id: new ObjectId().toHexString(),
 };
 
-const testUser2: User = {
+const testUser2 = {
     _id: new ObjectId().toHexString(),
 };
 
-const testReports: FeedbackReport[] = [
+const testReports = [
     {
         _id: new ObjectId(),
         date: new Date().toISOString(),

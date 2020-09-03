@@ -1,27 +1,25 @@
 import { ObjectId } from 'mongodb';
 
 import Collections, { connect, close } from 'db';
-import { BugReport, User } from 'lib/interfaces';
 import faker from 'faker';
 import request from 'supertest';
 import app from 'app';
 
-const testUser1: User = {
+const testUser1 = {
     _id: new ObjectId().toHexString(),
 };
 
-const testUser2: User = {
+const testUser2 = {
     _id: new ObjectId().toHexString(),
 };
 
-const testReports: BugReport[] = [
+const testReports = [
     {
         _id: new ObjectId(),
         date: new Date().toISOString(),
         description: 'Avengers Assemble!!!',
         townhallId: new ObjectId().toHexString(),
         submitterId: testUser1._id,
-        resolved: false,
     },
     {
         _id: new ObjectId(),
@@ -29,7 +27,6 @@ const testReports: BugReport[] = [
         description: 'Wakanda Forever!!',
         townhallId: new ObjectId().toHexString(),
         submitterId: testUser2._id,
-        resolved: false,
     },
 ];
 
@@ -667,6 +664,88 @@ describe('bug-reports', () => {
                 _id: testReports[0]._id,
                 user: testUser1,
             });
+            expect(status).toStrictEqual(200);
+        });
+    });
+    describe('/updateResolvedStatus', () => {
+        const endpoint = '/api/bugs/updateResolvedStatus';
+
+        it('should fail since resolved status is not sent', async () => {
+            const { status } = await request(app).post(
+                `${endpoint}/${testReports[0]._id.toHexString()}`
+            );
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since empty resolved status is sent', async () => {
+            const { status } = await request(app)
+                .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
+                .send({
+                    resolvedStatus: '',
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since undefined resolved status is sent', async () => {
+            const { status } = await request(app)
+                .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
+                .send({
+                    resolvedStatus: undefined,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since null resolved status is sent', async () => {
+            const { status } = await request(app)
+                .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
+                .send({
+                    resolvedStatus: null,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since invalid resolved status is sent', async () => {
+            const { status } = await request(app)
+                .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
+                .send({
+                    resolvedStatus: faker.random.word(),
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since long invalid resolved status is sent', async () => {
+            const { status } = await request(app)
+                .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
+                .send({
+                    resolvedStatus: faker.lorem.paragraphs(),
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since random long positive number is sent as resolvedStatus', async () => {
+            const { status } = await request(app)
+                .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
+                .send({
+                    resolvedStatus: Number.MAX_VALUE,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since random long negative number is sent as resolvedStatus', async () => {
+            const { status } = await request(app)
+                .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
+                .send({
+                    resolvedStatus: Number.MIN_VALUE,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should pass since valid resolved status ("true") is sent', async () => {
+            const { status } = await request(app)
+                .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
+                .send({
+                    resolvedStatus: 'true',
+                });
+            expect(status).toStrictEqual(200);
+        });
+        it('should pass since valid resolved status ("false") is sent', async () => {
+            const { status } = await request(app)
+                .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
+                .send({
+                    resolvedStatus: 'false',
+                });
             expect(status).toStrictEqual(200);
         });
     });
