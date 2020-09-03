@@ -21,6 +21,7 @@ const testReports: BugReport[] = [
         description: 'Avengers Assemble!!!',
         townhallId: new ObjectId().toHexString(),
         submitterId: testUser1._id,
+        resolved: false,
     },
     {
         _id: new ObjectId(),
@@ -28,6 +29,7 @@ const testReports: BugReport[] = [
         description: 'Wakanda Forever!!',
         townhallId: new ObjectId().toHexString(),
         submitterId: testUser2._id,
+        resolved: false,
     },
 ];
 

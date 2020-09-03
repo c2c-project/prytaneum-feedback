@@ -10,7 +10,7 @@ import Collections from 'db';
 import { BugReport, User } from 'lib/interfaces';
 
 /**
- * @description Creates a new bug report.
+ * @description Creates a new bug report. The state of a new report is non-resolved.
  * @param {string} date - Date when the bug report was concentrated at.
  * @param {string} description - Description of the bug report.
  * @param {string} townhallId - Id of the townhall session where the bug occurred.
@@ -28,6 +28,7 @@ export const createReport = (
         description,
         townhallId,
         submitterId: user._id,
+        resolved: false,
     });
 };
 
@@ -128,4 +129,20 @@ export const getNumberOfBugReportsBySubmitter = (
     submitterId: string
 ): Promise<number> => {
     return Collections.BugReport().countDocuments({ submitterId });
+};
+
+/**
+ * @description Sets the resolved attribute of a bug report to the resolvedStatus provided.
+ * @param {string} _id -  Id of the report
+ * @param {string} resolvedStatus - resolved status
+ * @returns Mongodb promise
+ */
+export const markReportAsResolved = (
+    _id: string,
+    resolvedStatus: string
+): Promise<UpdateWriteOpResult> => {
+    return Collections.BugReport().updateOne(
+        { _id: new ObjectId(_id) },
+        { $set: { resolved: resolvedStatus === 'true' } }
+    );
 };

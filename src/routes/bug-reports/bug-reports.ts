@@ -11,6 +11,7 @@ import {
     deleteReport,
     getNumberOfBugReports,
     getNumberOfBugReportsBySubmitter,
+    markReportAsResolved,
 } from '../../modules/bug-reports';
 
 const router = express.Router();
@@ -252,5 +253,41 @@ router.post('/delete-report', async (req: Request, res: Response) => {
         res.sendStatus(400);
     }
 });
+
+/**
+ * @description Marks a bug report as resolved or unresolved
+ * @param {Object} Request.params
+ * @param {string} Request.params._id - Id of the report to mark as resolved
+ * @param {Object} Request.body.user - User that requests the delete
+ * @param {"true" | "false"} Request.body.resolvedStatus - value used to set the resolvedStatus of the report. "true" for resolved. "false" for unresolved
+ * @returns {Object} Response
+ * */
+// TODO: This endpoint only works for admin users
+router.post(
+    '/updateResolvedStatus/:_id',
+    async (req: Request, res: Response) => {
+        try {
+            // TODO: If calling user does not have admin permissions, throw error
+            const { _id } = req.params as { _id: string };
+            const { resolvedStatus } = req.body as { resolvedStatus: string };
+            if (!_id) {
+                throw Error('Missing report Id');
+            }
+            if (!resolvedStatus) {
+                throw Error('Missing resolved status');
+            }
+            if (resolvedStatus !== 'true' && resolvedStatus !== 'false') {
+                throw Error('Invalid resolved status');
+            }
+            await markReportAsResolved(_id, resolvedStatus);
+            res.statusMessage = 'Resolved status successfully updated';
+            res.sendStatus(200);
+        } catch (error) {
+            log.error(error);
+            res.statusMessage = 'Some error occurred. Please try again';
+            res.sendStatus(400);
+        }
+    }
+);
 
 export default router;
