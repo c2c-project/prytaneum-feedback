@@ -29,6 +29,7 @@ export const createReport = (
         townhallId,
         submitterId: user._id,
         resolved: false,
+        replies: [],
     });
 };
 

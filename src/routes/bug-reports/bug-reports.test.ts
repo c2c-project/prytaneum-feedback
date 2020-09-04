@@ -20,6 +20,7 @@ const testReports = [
         description: 'Avengers Assemble!!!',
         townhallId: new ObjectId().toHexString(),
         submitterId: testUser1._id,
+        replies: [],
     },
     {
         _id: new ObjectId(),
@@ -27,6 +28,7 @@ const testReports = [
         description: 'Wakanda Forever!!',
         townhallId: new ObjectId().toHexString(),
         submitterId: testUser2._id,
+        replies: [],
     },
 ];
 

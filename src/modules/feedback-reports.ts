@@ -25,6 +25,7 @@ export const createReport = (
         date: new Date(date),
         description,
         submitterId: user._id,
+        replies: [],
     });
 };
 

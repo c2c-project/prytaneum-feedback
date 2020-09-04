@@ -19,12 +19,14 @@ const testReports = [
         date: new Date().toISOString(),
         description: 'Avengers Assemble!!!',
         submitterId: testUser1._id,
+        replies: [],
     },
     {
         _id: new ObjectId(),
         date: new Date().toISOString(),
         description: 'Wakanda Forever!!',
         submitterId: testUser2._id,
+        replies: [],
     },
 ];
 
