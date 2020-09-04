@@ -266,7 +266,7 @@ router.post('/delete-report', async (req: Request, res: Response) => {
  * @param {boolean} Request.body.resolvedStatus - Value used to set the resolvedStatus of the report. "true" for resolved. "false" for unresolved
  * @returns {Object} Response
  * */
-// TODO: This endpoint only works for admin users
+// TODO: This endpoint should only works for admin users
 router.post(
     '/updateResolvedStatus/:_id',
     async (req: Request, res: Response) => {
@@ -302,7 +302,7 @@ router.post(
  * @returns {Object} Response
  * */
 
-// TODO: This endpoint only works for admin users
+// TODO: This endpoint should only works for admin users
 router.post('/replyTo/:_id', async (req: Request, res: Response) => {
     try {
         // TODO: If calling user does not have admin permissions, throw error
