@@ -153,3 +153,29 @@ export const markReportAsResolved = (
         { $set: { resolved: resolvedStatus } }
     );
 };
+
+// TODO: Make sure the replies are sorted by date in ascending order
+export const replyToBugReport = (
+    user: User,
+    _id: string,
+    replyContent: string,
+    repliedDate: string
+): Promise<UpdateWriteOpResult> => {
+    return Collections.BugReport().updateOne(
+        { _id: new ObjectId(_id) },
+        {
+            $push: {
+                replies: {
+                    $each: [
+                        {
+                            content: replyContent,
+                            repliedDate: new Date(repliedDate),
+                            repliedBy: user,
+                        },
+                    ],
+                    $sort: { repliedDate: 1 },
+                },
+            },
+        }
+    );
+};

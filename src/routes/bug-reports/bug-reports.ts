@@ -12,6 +12,7 @@ import {
     getNumberOfBugReports,
     getNumberOfBugReportsBySubmitter,
     markReportAsResolved,
+    replyToBugReport,
 } from '../../modules/bug-reports';
 
 const router = express.Router();
@@ -290,4 +291,46 @@ router.post(
     }
 );
 
+/**
+ * @description Adds a reply to a bug report. Caller must have admin permission.
+ * @param {Object} Request.params
+ * @param {string} Request.params._id - Id of the report
+ * @param {Object} Request.body.user - User that replies to the report
+ * @param {string} Request.body.user._id - Id of replier
+ * @param {string} Request.body.replyContent - Content of the reply
+ * @param {string} Request.body.repliedDate - Date when reply is submitted
+ * @returns {Object} Response
+ * */
+
+// TODO: This endpoint only works for admin users
+router.post('/replyTo/:_id', async (req: Request, res: Response) => {
+    try {
+        // TODO: If calling user does not have admin permissions, throw error
+        const { _id } = req.params as { _id: string };
+        const { user, replyContent, repliedDate } = req.body as {
+            user: User;
+            replyContent: string;
+            repliedDate: string;
+        };
+        if (!_id) {
+            throw Error('Missing bug report Id');
+        }
+        if (!user || Object.keys(user).length === 0) {
+            throw Error('Missing user');
+        }
+        if (!user._id) {
+            throw Error('Missing user Id');
+        }
+        if (!replyContent) {
+            throw Error('Missing reply content');
+        }
+        await replyToBugReport(user, _id, replyContent, repliedDate);
+        res.statusMessage = 'Reply succcessfully submitted';
+        res.sendStatus(200);
+    } catch (error) {
+        log.error(error);
+        res.statusMessage = 'Some error occurred. Please try again';
+        res.sendStatus(400);
+    }
+});
 export default router;
