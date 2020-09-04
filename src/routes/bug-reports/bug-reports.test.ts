@@ -802,4 +802,140 @@ describe('bug-reports', () => {
             expect(status).toStrictEqual(200);
         });
     });
+    describe('/replyTo', () => {
+        const endpoint = `/api/bugs/replyTo/${testReports[0]._id.toHexString()}`;
+        it('should fail since request body is not sent', async () => {
+            const { status } = await request(app).post(endpoint);
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since user object is missing', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                replyContent: faker.lorem.paragraph(),
+                repliedDate: new Date().toISOString(),
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since undefined user object is sent', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: undefined,
+                replyContent: faker.lorem.paragraph(),
+                repliedDate: new Date().toISOString(),
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since null user object is sent', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: null,
+                replyContent: faker.lorem.paragraph(),
+                repliedDate: new Date().toISOString(),
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since user object without id is sent', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: {},
+                replyContent: faker.lorem.paragraph(),
+                repliedDate: new Date().toISOString(),
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since empty user Id is sent', async () => {
+            const { status } = await request(app)
+                .post(endpoint)
+                .send({
+                    user: {
+                        _id: '',
+                    },
+                    replyContent: faker.lorem.paragraph(),
+                    repliedDate: new Date().toISOString(),
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since undefined user Id is sent', async () => {
+            const { status } = await request(app)
+                .post(endpoint)
+                .send({
+                    user: {
+                        _id: undefined,
+                    },
+                    replyContent: faker.lorem.paragraph(),
+                    repliedDate: new Date().toISOString(),
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since null user Id is sent', async () => {
+            const { status } = await request(app)
+                .post(endpoint)
+                .send({
+                    user: {
+                        _id: null,
+                    },
+                    replyContent: faker.lorem.paragraph(),
+                    repliedDate: new Date().toISOString(),
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since reply content is missing', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: testUser1,
+                repliedDate: new Date().toISOString(),
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since reply content is undefined', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: testUser1,
+                replyContent: undefined,
+                repliedDate: new Date().toISOString(),
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since reply content is null', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: testUser1,
+                replyContent: null,
+                repliedDate: new Date().toISOString(),
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since replied date is missing', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: testUser1,
+                replyContent: faker.lorem.paragraphs(),
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since replied date is undefined', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: testUser1,
+                replyContent: faker.lorem.paragraphs(),
+                repliedDate: undefined,
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since replied date is null', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: testUser1,
+                replyContent: faker.lorem.paragraphs(),
+                repliedDate: null,
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should pass since body of request is valid. Case 1', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: testUser1,
+                replyContent: faker.lorem.paragraphs(),
+                repliedDate: new Date().toISOString(),
+            });
+            expect(status).toStrictEqual(200);
+        });
+        it('should pass since body of request is valid. Case2', async () => {
+            const { status } = await request(app).post(endpoint).send({
+                user: testUser2,
+                replyContent: faker.lorem.paragraph(),
+                repliedDate: new Date().toISOString(),
+            });
+            expect(status).toStrictEqual(200);
+        });
+    });
 });
