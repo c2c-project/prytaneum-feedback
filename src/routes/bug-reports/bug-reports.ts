@@ -108,13 +108,15 @@ router.get('/get-reports', async (req: Request, res: Response) => {
 
 interface UserRequestBody {
     user?: User;
+    page?: number;
+    ascending?: boolean;
 }
 /**
  * @description Retrieves all bug reports submitted by a specific user. Calling user must have the same Id as the one provided in the request parameters
  * @param {Object} Request
  * @param {string} Request.params.submitterId - Id of submitter
- * @param {string} Request.query.page - Number of page of reports to retrieve
- * @param {string} Request.query.ascending - Sort by date order. Either 'true' or 'false'
+ * @param {string} Request.body.page - Number of page of reports to retrieve
+ * @param {string} Request.body.ascending - Sort by date order. Either 'true' or 'false'
  * @param {Object} Request.body.user - User that submits the report
  * @param {string} Request.body.user._id - Id of the user
  * @returns {Object} Response
@@ -124,11 +126,7 @@ interface UserRequestBody {
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
         const { submitterId } = req.params as { submitterId: string };
-        const { user } = req.body as UserRequestBody;
-        const { page, ascending } = req.query as {
-            page?: string;
-            ascending?: string;
-        };
+        const { user, page, ascending } = req.body as UserRequestBody;
         if (!user) {
             throw Error('Missing user object');
         }
@@ -138,14 +136,14 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
         if (submitterId !== user._id) {
             throw Error('Calling user is not owner of the report');
         }
-        if (!page) {
-            throw Error('Missing page number');
+        if (typeof page !== 'number') {
+            throw Error('Invalid page number');
         }
-        if (!ascending) {
-            throw Error('Missing ascending');
+        if (typeof ascending !== 'boolean') {
+            throw Error('Invalid ascending');
         }
         const bugReports: BugReport[] = await getReportBySubmitter(
-            parseInt(page, 10),
+            page,
             ascending,
             submitterId
         );

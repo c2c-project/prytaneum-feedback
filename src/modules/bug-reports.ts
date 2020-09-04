@@ -69,12 +69,12 @@ export const getReports = (
  */
 export const getReportBySubmitter = (
     page: number,
-    ascending: string,
+    ascending: boolean,
     submitterId: string
 ): Promise<BugReport[]> => {
     return Collections.BugReport()
         .find({ submitterId })
-        .sort({ date: ascending === 'true' ? 1 : -1 })
+        .sort({ date: ascending ? 1 : -1 })
         .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
         .limit(numberOfDocumentsPerPage)
         .toArray();

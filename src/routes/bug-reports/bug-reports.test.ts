@@ -302,6 +302,8 @@ describe('bug-reports', () => {
                 .get(`${endpoint}/${testUser1._id}`)
                 .send({
                     user: {},
+                    page: 10,
+                    ascending: true,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -310,6 +312,8 @@ describe('bug-reports', () => {
                 .get(`${endpoint}/${testUser1._id}`)
                 .send({
                     user: undefined,
+                    page: 7,
+                    ascending: true,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -318,6 +322,8 @@ describe('bug-reports', () => {
                 .get(`${endpoint}/${testUser1._id}`)
                 .send({
                     user: null,
+                    page: 7,
+                    ascending: false,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -326,6 +332,8 @@ describe('bug-reports', () => {
                 .get(`${endpoint}/${testUser1._id}`)
                 .send({
                     user: testUser2,
+                    page: 4,
+                    ascending: true,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -334,6 +342,8 @@ describe('bug-reports', () => {
                 .get(`${endpoint}/${faker.lorem.paragraphs()}`)
                 .send({
                     user: testUser2,
+                    page: 1,
+                    ascending: true,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -342,16 +352,21 @@ describe('bug-reports', () => {
                 .get(`${endpoint}/${faker.lorem.paragraphs()}`)
                 .send({
                     user: Number.MAX_VALUE,
+                    page: 6,
+                    ascending: false,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should pass since random submitter ids match but do not belong to any bugs report', async () => {
+            const randomId = faker.random.alphaNumeric(12);
             const { status } = await request(app)
-                .get(`${endpoint}/${Number.MAX_VALUE}?page=1&ascending=true`)
+                .get(`${endpoint}/${randomId}`)
                 .send({
                     user: {
-                        _id: Number.MAX_VALUE.toString(),
+                        _id: randomId,
                     },
+                    page: 1,
+                    ascending: true,
                 });
             expect(status).toStrictEqual(200);
         });
@@ -362,30 +377,56 @@ describe('bug-reports', () => {
                     user: {
                         _id: Number.MAX_VALUE,
                     },
+                    page: 1,
+                    ascending: true,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should pass since calling user id and submitter id  match', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}?page=1&ascending=false`)
+                .get(`${endpoint}/${testUser1._id}`)
                 .send({
                     user: testUser1,
+                    page: 1,
+                    ascending: true,
                 });
             expect(status).toStrictEqual(200);
         });
         it('should fail since ascending query parameter is not sent', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}?page=1`)
+                .get(`${endpoint}/${testUser1._id}`)
                 .send({
                     user: testUser1,
+                    page: 1,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since page query parameter is not sent', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}?ascending=false`)
+                .get(`${endpoint}/${testUser1._id}`)
                 .send({
                     user: testUser1,
+                    ascending: false,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since a random non-number value is sent for page', async () => {
+            const { status } = await request(app)
+                .get(`${endpoint}/${testUser1._id}`)
+                .send({
+                    user: testUser1,
+                    page: faker.lorem.paragraph(),
+                    ascending: false,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since a random non-boolean value is sent for ascending', async () => {
+            const { status } = await request(app)
+                .get(`${endpoint}/${testUser1._id}`)
+                .send({
+                    user: testUser1,
+                    page: 10,
+                    ascending: faker.random.number(),
                 });
             expect(status).toStrictEqual(400);
         });
