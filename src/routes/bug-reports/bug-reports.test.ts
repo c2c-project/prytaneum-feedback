@@ -192,93 +192,103 @@ describe('bug-reports', () => {
         // TODO: Test by calling from Admin service. Expect a 200 status and an array of bug reports
         // TODO: Test by calling from service that is not the Admin service. Expect a 400 status
         const endpoint = '/api/bugs/get-reports';
-        it('should fail since page and ascending query parameters are not provided', async () => {
+        it('should fail since page and ascending are not provided', async () => {
             const { status } = await request(app).get(endpoint);
             expect(status).toStrictEqual(400);
         });
-        it('should fail since ascending query parameter is not provided', async () => {
-            const { status } = await request(app).get(`${endpoint}?page=1`);
+        it('should fail since ascending  is not provided', async () => {
+            const { status } = await request(app).get(endpoint).send({
+                page: 1,
+            });
             expect(status).toStrictEqual(400);
         });
-        it('should page zero gets converted to page 1', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=0&ascending=true`
-            );
+        it('should passing since page zero gets converted to page 1', async () => {
+            const { status } = await request(app).get(endpoint).send({
+                page: 0,
+                ascending: true,
+            });
             expect(status).toStrictEqual(200);
         });
         it('should pass since page number greater than current number of pages returns 0 bugs reports', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=2&ascending=true`
-            );
+            const { status } = await request(app).get(endpoint).send({
+                page: 2,
+                ascending: true,
+            });
             expect(status).toStrictEqual(200);
         });
         it('should pass since negative page number gets returns first page', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=-1&ascending=true`
-            );
+            const { status } = await request(app).get(endpoint).send({
+                page: -1,
+                ascending: true,
+            });
             expect(status).toStrictEqual(200);
         });
-        it('should pass since negative page number gets converted to page zero', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=-135423652764745672745741235&ascending=false`
-            );
+        it('should pass since big negative page number gets converted to page zero', async () => {
+            const { status } = await request(app).get(endpoint).send({
+                page: -135423652764745672745741235,
+                ascending: false,
+            });
             expect(status).toStrictEqual(200);
         });
         it('should fail since big positive page number is passed', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=135423652764745672745741235&ascending=true`
-            );
+            const { status } = await request(app).get(endpoint).send({
+                page: 135423652764745672745741235,
+                ascending: true,
+            });
             expect(status).toStrictEqual(400);
         });
-        it('should pass since infinite positive page number gets converted to page zero', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=${Number.POSITIVE_INFINITY}&ascending=true`
-            );
-            expect(status).toStrictEqual(200);
-        });
-        it('should pass since string for page number gets converted to page zero', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=@&ascending=true`
-            );
-            expect(status).toStrictEqual(200);
-        });
-        it('should pass since random long string for page number gets converted to page zero', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=vrtwerby456r5weyberwthy356456yertbgy53yb456yhnby&ascending=true`
-            );
-            expect(status).toStrictEqual(200);
-        });
-        it('should pass since longer string for page number gets converted to page zero', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=${faker.lorem.paragraphs()}&ascending=true`
-            );
-            expect(status).toStrictEqual(200);
-        });
-        it('should fail since empty page number is provided', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=&ascending=true`
-            );
+        it('should pass since infinite positive page number breaks mongo query', async () => {
+            const { status } = await request(app).get(endpoint).send({
+                page: Number.POSITIVE_INFINITY,
+                ascending: true,
+            });
             expect(status).toStrictEqual(400);
         });
-        it('should pass since ascending parameter is true', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=1&ascending=true`
-            );
+        it('should fail since string for page number is invalid', async () => {
+            const { status } = await request(app).get(endpoint).send({
+                page: faker.random.word(),
+                ascending: true,
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since random long string for page number is invalid', async () => {
+            const { status } = await request(app)
+                .get(endpoint)
+                .send({
+                    page: faker.random.words(40),
+                    ascending: true,
+                });
+            expect(status).toStrictEqual(400);
+        });
+        it('should fail since page number is not provided', async () => {
+            const { status } = await request(app).get(endpoint).send({
+                ascending: true,
+            });
+            expect(status).toStrictEqual(400);
+        });
+        it('should pass since required parameters are provided. Case 1', async () => {
+            const { status } = await request(app).get(endpoint).send({
+                page: 1,
+                ascending: true,
+            });
             expect(status).toStrictEqual(200);
         });
-        it('should pass since ascending parameter is false', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=1&ascending=false`
-            );
+        it('should pass since required parameters are provided. Case 2', async () => {
+            const { status } = await request(app).get(endpoint).send({
+                page: 1,
+                ascending: false,
+            });
             expect(status).toStrictEqual(200);
         });
-        it('should pass since random value for ascending parameter gets converted to false', async () => {
-            const { status } = await request(app).get(
-                `${endpoint}?page=1&ascending=${faker.random.word()}`
-            );
-            expect(status).toStrictEqual(200);
+        it('should fail since random value for ascending parameter is provided', async () => {
+            const { status } = await request(app).get(endpoint).send({
+                page: 1,
+                ascending: faker.random.word(),
+            });
+            expect(status).toStrictEqual(400);
         });
     });
+    // TODO: Make query parameters be passed in the body
     describe('/get-reports/:submitterId', () => {
         const endpoint = '/api/bugs/get-reports';
         it('should fail since user object is not sent', async () => {
@@ -736,7 +746,7 @@ describe('bug-reports', () => {
             const { status } = await request(app)
                 .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
                 .send({
-                    resolvedStatus: 'true',
+                    resolvedStatus: true,
                 });
             expect(status).toStrictEqual(200);
         });
@@ -744,7 +754,7 @@ describe('bug-reports', () => {
             const { status } = await request(app)
                 .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
                 .send({
-                    resolvedStatus: 'false',
+                    resolvedStatus: false,
                 });
             expect(status).toStrictEqual(200);
         });

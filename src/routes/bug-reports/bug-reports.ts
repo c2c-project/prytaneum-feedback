@@ -68,9 +68,10 @@ router.post('/create-report', async (req: Request, res: Response) => {
 
 /**
  * @description Retrieves at most 10 reports from the bug-reports collection, depending on the page number provided. Calling user must be have admin permission.
- * @param {Object} Request.query
- * @param {string} Request.query.page - Number of page of reports to retrieve
- * @param {string} Request.query.ascending - Sort by date order. Either 'true' or 'false'
+ * @param {Object} Request.body
+ * @param {number} Request.body.page - Number of page of reports to retrieve
+ * @param {boolean} Request.body.ascending - Sort by date in ascending order.
+ * @param {boolean} Request.body.resolved - Returns reports with this resolved status. If not provided, all reports are returned
  * @returns {Object} Response
  * @returns {BugReport[]} Response.reports - Array of reports retrieved from the collection
  * @returns {number} Response.count - Total count of reports in the collection
@@ -78,20 +79,24 @@ router.post('/create-report', async (req: Request, res: Response) => {
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
-        const { page, ascending } = req.query as {
-            page?: string;
-            ascending?: string;
+        const { page, ascending, resolved } = req.body as {
+            page?: number;
+            ascending?: boolean;
+            resolved?: boolean;
         };
-        if (!page) {
-            throw Error('Missing page number');
+        if (typeof page !== 'number') {
+            throw Error('Invalid page number');
         }
-        if (!ascending) {
-            throw Error('Missing ascending');
+        if (typeof ascending !== 'boolean') {
+            throw Error('Invalid ascending');
         }
         const bugReports: BugReport[] = await getReports(
-            parseInt(page, 10),
-            ascending
+            page,
+            ascending,
+            resolved
         );
+
+        // TODO: Fix. So that it returns the count of report per the resolved query
         const countOfReports = await getNumberOfBugReports();
         res.status(200).send({ reports: bugReports, count: countOfReports });
     } catch (error) {
@@ -259,7 +264,7 @@ router.post('/delete-report', async (req: Request, res: Response) => {
  * @param {Object} Request.params
  * @param {string} Request.params._id - Id of the report to mark as resolved
  * @param {Object} Request.body.user - User that requests the delete
- * @param {"true" | "false"} Request.body.resolvedStatus - Value used to set the resolvedStatus of the report. "true" for resolved. "false" for unresolved
+ * @param {boolean} Request.body.resolvedStatus - Value used to set the resolvedStatus of the report. "true" for resolved. "false" for unresolved
  * @returns {Object} Response
  * */
 // TODO: This endpoint only works for admin users
@@ -269,14 +274,11 @@ router.post(
         try {
             // TODO: If calling user does not have admin permissions, throw error
             const { _id } = req.params as { _id: string };
-            const { resolvedStatus } = req.body as { resolvedStatus: string };
+            const { resolvedStatus } = req.body as { resolvedStatus: boolean };
             if (!_id) {
                 throw Error('Missing report Id');
             }
-            if (!resolvedStatus) {
-                throw Error('Missing resolved status');
-            }
-            if (resolvedStatus !== 'true' && resolvedStatus !== 'false') {
+            if (typeof resolvedStatus !== 'boolean') {
                 throw Error('Invalid resolved status');
             }
             await markReportAsResolved(_id, resolvedStatus);

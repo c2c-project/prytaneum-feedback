@@ -42,12 +42,18 @@ export const createReport = (
 const numberOfDocumentsPerPage = 10;
 export const getReports = (
     page: number,
-    ascending: string
+    ascending: boolean,
+    resolved?: boolean
 ): Promise<BugReport[]> => {
+    const resolvedQuery =
+        typeof resolved === 'boolean'
+            ? { resolved }
+            : { $or: [{ resolved: true }, { resolved: false }] };
+
     return (
         Collections.BugReport()
-            .find()
-            .sort({ date: ascending === 'true' ? 1 : -1 })
+            .find(resolvedQuery)
+            .sort({ date: ascending ? 1 : -1 })
             // If page is a negative number or undefined then we get the first page
             .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
             .limit(numberOfDocumentsPerPage)
@@ -134,15 +140,15 @@ export const getNumberOfBugReportsBySubmitter = (
 /**
  * @description Sets the resolved attribute of a bug report to the resolvedStatus provided.
  * @param {string} _id -  Id of the report
- * @param {string} resolvedStatus - resolved status
+ * @param {boolean} resolvedStatus - resolved status
  * @returns Mongodb promise
  */
 export const markReportAsResolved = (
     _id: string,
-    resolvedStatus: string
+    resolvedStatus: boolean
 ): Promise<UpdateWriteOpResult> => {
     return Collections.BugReport().updateOne(
         { _id: new ObjectId(_id) },
-        { $set: { resolved: resolvedStatus === 'true' } }
+        { $set: { resolved: resolvedStatus } }
     );
 };
