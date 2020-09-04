@@ -160,8 +160,8 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
 });
 
 interface UpdateReportRequestBody {
-    _id: string;
-    newDescription: string;
+    _id?: string;
+    newDescription?: string;
     user?: User;
 }
 /**
@@ -273,7 +273,7 @@ router.post(
         try {
             // TODO: If calling user does not have admin permissions, throw error
             const { _id } = req.params as { _id: string };
-            const { resolvedStatus } = req.body as { resolvedStatus: boolean };
+            const { resolvedStatus } = req.body as { resolvedStatus?: boolean };
             if (!_id) {
                 throw Error('Missing report Id');
             }
@@ -308,9 +308,9 @@ router.post('/replyTo/:_id', async (req: Request, res: Response) => {
         // TODO: If calling user does not have admin permissions, throw error
         const { _id } = req.params as { _id: string };
         const { user, replyContent, repliedDate } = req.body as {
-            user: User;
-            replyContent: string;
-            repliedDate: string;
+            user?: User;
+            replyContent?: string;
+            repliedDate?: string;
         };
         if (!_id) {
             throw Error('Missing bug report Id');
@@ -324,8 +324,12 @@ router.post('/replyTo/:_id', async (req: Request, res: Response) => {
         if (!replyContent) {
             throw Error('Missing reply content');
         }
+        if (!repliedDate) {
+            throw Error('Missing reply content');
+        }
+
         await replyToBugReport(user, _id, replyContent, repliedDate);
-        res.statusMessage = 'Reply succcessfully submitted';
+        res.statusMessage = 'Reply successfully submitted';
         res.sendStatus(200);
     } catch (error) {
         log.error(error);
