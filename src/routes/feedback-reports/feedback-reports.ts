@@ -11,7 +11,7 @@ import {
     deleteReport,
     getNumberOfFeedbackReports,
     getNumberOfFeedbackReportsBySubmitter,
-} from '../../modules/feedback-reports';
+} from 'modules/feedback-reports';
 
 const router = express.Router();
 
@@ -167,7 +167,7 @@ interface UpdateReportRequestBody {
 /**
  * @description Updates the description of a specific report from the feedback-reports collection.
  * @param {Object} Request.body
- * @param {string} Request.body._id - Id of report to update 
+ * @param {string} Request.body._id - Id of report to update
  * @param {string} Request.body.newDescription - new description of the report
  * @param {Object} Request.body.user - User that requests the update
  * @param {string} Request.body.user._id - Id of the user
@@ -222,7 +222,7 @@ interface DeleteReportRequestBody {
  * @description Deletes a specific report from the feedback-reports collection.
  * @param {Object} Request.body
  * @param {string} Request.body._id - Id of the report to delete
- * @param {Object} Request.body.user - User that requests the delete 
+ * @param {Object} Request.body.user - User that requests the delete
  * @param {string} Request.body.user._id - Id of the user
  * @returns {Object} Response
  * */

@@ -36,14 +36,15 @@ export const createReport = (
 /**
  * @description Retrieves at most 10 reports from the bug-reports collection depending on the page number.
  * @param {number} page - Page number to return. If the page number exceeds the number of available pages, 0 reports are returned.
- * @param {string} ascending - Describes the sorted order of the reports.'True' for ascending. 'False' for descending.
+ * @param {boolean} sortByDate - Sort by date order. True for ascending. False for descending.
+ * @param {boolean} resolved - Resolved status of reports to retrieve
  * @returns {Promise<BugReport[]>} - promise that will produce an array of bug reports.
  * @
  */
 const numberOfDocumentsPerPage = 10;
 export const getReports = (
     page: number,
-    ascending: boolean,
+    sortByDate: boolean,
     resolved?: boolean
 ): Promise<BugReport[]> => {
     const resolvedQuery =
@@ -54,7 +55,7 @@ export const getReports = (
     return (
         Collections.BugReport()
             .find(resolvedQuery)
-            .sort({ date: ascending ? 1 : -1 })
+            .sort({ date: sortByDate ? 1 : -1 })
             // If page is a negative number or undefined then we get the first page
             .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
             .limit(numberOfDocumentsPerPage)
@@ -63,19 +64,20 @@ export const getReports = (
 };
 
 /**
- * @description Retrieves at most 10  bug reports from a specific submitter, depending on the page number.
+ * @description Retrieves at most 10 bug reports from a specific submitter, depending on the page number.
  * @param {number} page - Page number to return. If the page number exceeds the number of available pages, 0 reports are returned.
- * @param {string} ascending - Describes the sorted order of the reports.'True' for ascending. 'False' for descending.
+ * @param {boolean} sortByDate - Sort by date order. True for ascending. False for descending.
+ * @param {string} submitterId - submitter's Id of reports to retrieve
  * @returns {Promise<BugReport[]>} - Promise that will produce an array of bug reports.
  */
 export const getReportBySubmitter = (
     page: number,
-    ascending: boolean,
+    sortByDate: boolean,
     submitterId: string
 ): Promise<BugReport[]> => {
     return Collections.BugReport()
         .find({ submitterId })
-        .sort({ date: ascending ? 1 : -1 })
+        .sort({ date: sortByDate ? 1 : -1 })
         .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
         .limit(numberOfDocumentsPerPage)
         .toArray();
@@ -144,7 +146,7 @@ export const getNumberOfBugReportsBySubmitter = (
  * @param {boolean} resolvedStatus - resolved status
  * @returns Mongodb promise
  */
-export const markReportAsResolved = (
+export const updateResolvedStatus = (
     _id: string,
     resolvedStatus: boolean
 ): Promise<UpdateWriteOpResult> => {
@@ -154,7 +156,14 @@ export const markReportAsResolved = (
     );
 };
 
-// TODO: Make sure the replies are sorted by date in ascending order
+/**
+ * @description Adds a reply to a report
+ * @param {Object} user - user object of the replier
+ * @param {string} _id -  Id of the report
+ * @param {string} replyContent - Content of the reply
+ * @param {string} repliedDate - Date when the reply is submitted
+ * @returns Mongodb promise
+ */
 export const replyToBugReport = (
     user: User,
     _id: string,

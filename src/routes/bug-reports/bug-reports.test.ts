@@ -194,11 +194,11 @@ describe('bug-reports', () => {
         // TODO: Test by calling from Admin service. Expect a 200 status and an array of bug reports
         // TODO: Test by calling from service that is not the Admin service. Expect a 400 status
         const endpoint = '/api/bugs/get-reports';
-        it('should fail since page and ascending are not provided', async () => {
+        it('should fail since page and sortByDate are not provided', async () => {
             const { status } = await request(app).get(endpoint);
             expect(status).toStrictEqual(400);
         });
-        it('should fail since ascending  is not provided', async () => {
+        it('should fail since sortByDate  is not provided', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: 1,
             });
@@ -207,49 +207,49 @@ describe('bug-reports', () => {
         it('should passing since page zero gets converted to page 1', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: 0,
-                ascending: true,
+                sortByDate: true,
             });
             expect(status).toStrictEqual(200);
         });
         it('should pass since page number greater than current number of pages returns 0 bugs reports', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: 2,
-                ascending: true,
+                sortByDate: true,
             });
             expect(status).toStrictEqual(200);
         });
         it('should pass since negative page number gets returns first page', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: -1,
-                ascending: true,
+                sortByDate: true,
             });
             expect(status).toStrictEqual(200);
         });
         it('should pass since big negative page number gets converted to page zero', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: -135423652764745672745741235,
-                ascending: false,
+                sortByDate: false,
             });
             expect(status).toStrictEqual(200);
         });
         it('should fail since big positive page number is passed', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: 135423652764745672745741235,
-                ascending: true,
+                sortByDate: true,
             });
             expect(status).toStrictEqual(400);
         });
         it('should pass since infinite positive page number breaks mongo query', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: Number.POSITIVE_INFINITY,
-                ascending: true,
+                sortByDate: true,
             });
             expect(status).toStrictEqual(400);
         });
         it('should fail since string for page number is invalid', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: faker.random.word(),
-                ascending: true,
+                sortByDate: true,
             });
             expect(status).toStrictEqual(400);
         });
@@ -258,34 +258,34 @@ describe('bug-reports', () => {
                 .get(endpoint)
                 .send({
                     page: faker.random.words(40),
-                    ascending: true,
+                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since page number is not provided', async () => {
             const { status } = await request(app).get(endpoint).send({
-                ascending: true,
+                sortByDate: true,
             });
             expect(status).toStrictEqual(400);
         });
         it('should pass since required parameters are provided. Case 1', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: 1,
-                ascending: true,
+                sortByDate: true,
             });
             expect(status).toStrictEqual(200);
         });
         it('should pass since required parameters are provided. Case 2', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: 1,
-                ascending: false,
+                sortByDate: false,
             });
             expect(status).toStrictEqual(200);
         });
-        it('should fail since random value for ascending parameter is provided', async () => {
+        it('should fail since random value for sortByDate parameter is provided', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: 1,
-                ascending: faker.random.word(),
+                sortByDate: faker.random.word(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -305,7 +305,7 @@ describe('bug-reports', () => {
                 .send({
                     user: {},
                     page: 10,
-                    ascending: true,
+                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -315,7 +315,7 @@ describe('bug-reports', () => {
                 .send({
                     user: undefined,
                     page: 7,
-                    ascending: true,
+                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -325,7 +325,7 @@ describe('bug-reports', () => {
                 .send({
                     user: null,
                     page: 7,
-                    ascending: false,
+                    sortByDate: false,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -335,7 +335,7 @@ describe('bug-reports', () => {
                 .send({
                     user: testUser2,
                     page: 4,
-                    ascending: true,
+                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -345,7 +345,7 @@ describe('bug-reports', () => {
                 .send({
                     user: testUser2,
                     page: 1,
-                    ascending: true,
+                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -355,7 +355,7 @@ describe('bug-reports', () => {
                 .send({
                     user: Number.MAX_VALUE,
                     page: 6,
-                    ascending: false,
+                    sortByDate: false,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -368,7 +368,7 @@ describe('bug-reports', () => {
                         _id: randomId,
                     },
                     page: 1,
-                    ascending: true,
+                    sortByDate: true,
                 });
             expect(status).toStrictEqual(200);
         });
@@ -380,7 +380,7 @@ describe('bug-reports', () => {
                         _id: Number.MAX_VALUE,
                     },
                     page: 1,
-                    ascending: true,
+                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -390,11 +390,11 @@ describe('bug-reports', () => {
                 .send({
                     user: testUser1,
                     page: 1,
-                    ascending: true,
+                    sortByDate: true,
                 });
             expect(status).toStrictEqual(200);
         });
-        it('should fail since ascending query parameter is not sent', async () => {
+        it('should fail since sortByDate query parameter is not sent', async () => {
             const { status } = await request(app)
                 .get(`${endpoint}/${testUser1._id}`)
                 .send({
@@ -408,7 +408,7 @@ describe('bug-reports', () => {
                 .get(`${endpoint}/${testUser1._id}`)
                 .send({
                     user: testUser1,
-                    ascending: false,
+                    sortByDate: false,
                 });
             expect(status).toStrictEqual(400);
         });
@@ -418,17 +418,17 @@ describe('bug-reports', () => {
                 .send({
                     user: testUser1,
                     page: faker.lorem.paragraph(),
-                    ascending: false,
+                    sortByDate: false,
                 });
             expect(status).toStrictEqual(400);
         });
-        it('should fail since a random non-boolean value is sent for ascending', async () => {
+        it('should fail since a random non-boolean value is sent for sortByDate', async () => {
             const { status } = await request(app)
                 .get(`${endpoint}/${testUser1._id}`)
                 .send({
                     user: testUser1,
                     page: 10,
-                    ascending: faker.random.number(),
+                    sortByDate: faker.random.number(),
                 });
             expect(status).toStrictEqual(400);
         });

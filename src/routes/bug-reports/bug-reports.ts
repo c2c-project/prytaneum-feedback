@@ -11,9 +11,9 @@ import {
     deleteReport,
     getNumberOfBugReports,
     getNumberOfBugReportsBySubmitter,
-    markReportAsResolved,
+    updateResolvedStatus,
     replyToBugReport,
-} from '../../modules/bug-reports';
+} from 'modules/bug-reports';
 
 const router = express.Router();
 
@@ -71,7 +71,7 @@ router.post('/create-report', async (req: Request, res: Response) => {
  * @description Retrieves at most 10 reports from the bug-reports collection, depending on the page number provided. Calling user must be have admin permission.
  * @param {Object} Request.body
  * @param {number} Request.body.page - Number of page of reports to retrieve
- * @param {boolean} Request.body.ascending - Sort by date in ascending order.
+ * @param {boolean} Request.body.sortByDate - Sort by date order. True for ascending. False for descending.
  * @param {boolean} Request.body.resolved - Returns reports with this resolved status. If not provided, all reports are returned
  * @returns {Object} Response
  * @returns {BugReport[]} Response.reports - Array of reports retrieved from the collection
@@ -80,20 +80,20 @@ router.post('/create-report', async (req: Request, res: Response) => {
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
-        const { page, ascending, resolved } = req.body as {
+        const { page, sortByDate, resolved } = req.body as {
             page?: number;
-            ascending?: boolean;
+            sortByDate?: boolean;
             resolved?: boolean;
         };
         if (typeof page !== 'number') {
             throw Error('Invalid page number');
         }
-        if (typeof ascending !== 'boolean') {
-            throw Error('Invalid ascending');
+        if (typeof sortByDate !== 'boolean') {
+            throw Error('Invalid sortByDate');
         }
         const bugReports: BugReport[] = await getReports(
             page,
-            ascending,
+            sortByDate,
             resolved
         );
 
@@ -106,18 +106,12 @@ router.get('/get-reports', async (req: Request, res: Response) => {
         res.sendStatus(400);
     }
 });
-
-interface UserRequestBody {
-    user?: User;
-    page?: number;
-    ascending?: boolean;
-}
 /**
  * @description Retrieves all bug reports submitted by a specific user. Calling user must have the same Id as the one provided in the request parameters
  * @param {Object} Request
  * @param {string} Request.params.submitterId - Id of submitter
- * @param {string} Request.body.page - Number of page of reports to retrieve
- * @param {string} Request.body.ascending - Sort by date order. Either 'true' or 'false'
+ * @param {number} Request.body.page -= Page number of reports to retrieve
+ * @param {boolean} Request.body.sortByDate - Sort by date order. True for ascending. False for descending.
  * @param {Object} Request.body.user - User that submits the report
  * @param {string} Request.body.user._id - Id of the user
  * @returns {Object} Response
@@ -127,7 +121,12 @@ interface UserRequestBody {
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
         const { submitterId } = req.params as { submitterId: string };
-        const { user, page, ascending } = req.body as UserRequestBody;
+        const { user, page, sortByDate } = req.body as {
+            user?: User;
+            page?: number;
+            sortByDate?: boolean;
+        };
+
         if (!user) {
             throw Error('Missing user object');
         }
@@ -140,12 +139,12 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
         if (typeof page !== 'number') {
             throw Error('Invalid page number');
         }
-        if (typeof ascending !== 'boolean') {
-            throw Error('Invalid ascending');
+        if (typeof sortByDate !== 'boolean') {
+            throw Error('Invalid sortByDate');
         }
         const bugReports: BugReport[] = await getReportBySubmitter(
             page,
-            ascending,
+            sortByDate,
             submitterId
         );
         const countOfReports = await getNumberOfBugReportsBySubmitter(
@@ -262,11 +261,12 @@ router.post('/delete-report', async (req: Request, res: Response) => {
  * @description Marks a bug report as resolved or unresolved
  * @param {Object} Request.params
  * @param {string} Request.params._id - Id of the report to mark as resolved
- * @param {Object} Request.body.user - User that requests the delete
- * @param {boolean} Request.body.resolvedStatus - Value used to set the resolvedStatus of the report. "true" for resolved. "false" for unresolved
+ * @param {Object} Request.body.user - User that requests the update
+ * @param {boolean} Request.body.resolvedStatus - Value used to set the resolvedStatus of the report. true for resolved. false for unresolved
  * @returns {Object} Response
  * */
-// TODO: This endpoint should only works for admin users
+
+// TODO: This endpoint should only work for admin users
 router.post(
     '/updateResolvedStatus/:_id',
     async (req: Request, res: Response) => {
@@ -280,7 +280,7 @@ router.post(
             if (typeof resolvedStatus !== 'boolean') {
                 throw Error('Invalid resolved status');
             }
-            await markReportAsResolved(_id, resolvedStatus);
+            await updateResolvedStatus(_id, resolvedStatus);
             res.statusMessage = 'Resolved status successfully updated';
             res.sendStatus(200);
         } catch (error) {
