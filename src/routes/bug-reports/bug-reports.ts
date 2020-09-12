@@ -68,7 +68,7 @@ router.post('/create-report', async (req: Request, res: Response) => {
 });
 
 /**
- * @description Retrieves at most 10 bug reports from the database, depending on the page number provided. Calling user must be have admin permission.
+ * @description Retrieves at most 10 bug reports from the database, depending on the page number and resolved status provided. Calling user must be have admin permission.
  * @param {Object} Request.body
  * @param {number} Request.body.page - Number of page of reports to retrieve
  * @param {boolean} Request.body.sortByDate - Sort by date order. True for ascending. False for descending.
@@ -108,7 +108,7 @@ router.get('/get-reports', async (req: Request, res: Response) => {
 });
 
 /**
- * @description Retrieves all bug reports submitted by a specific user. Calling user must have the same Id as the one provided in the request parameters
+ * @description Retrieves at most 10 bug reports submitted by a specific user, depending on the page number provided. Calling user must have the same Id as the one provided in the request parameters
  * @param {Object} Request
  * @param {string} Request.params.submitterId - Id of submitter
  * @param {number} Request.body.page -= Page number of reports to retrieve

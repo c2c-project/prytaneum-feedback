@@ -59,7 +59,7 @@ router.post('/create-report', async (req: Request, res: Response) => {
 });
 
 /**
- * @description Retrieves at most 10 feedback reports from the database, depending on the page number provided. Calling user must be have admin permission.
+ * @description Retrieves at most 10 feedback reports from the database, depending on the page number and resolved status provided. Calling user must be have admin permission.
  * @param {Object} Request.body
  * @param {number} Request.body.page - Number of page of reports to retrieve
  * @param {boolean} Request.body.sortByDate - Sort by date order. True for ascending. False for descending.
@@ -101,12 +101,8 @@ router.get('/get-reports', async (req: Request, res: Response) => {
     }
 });
 
-interface UserRequestBody {
-    user?: User;
-}
-
 /**
- * @description Retrieves all feedback reports submitted by a specific user. Calling user must have the same Id as the one provided in the request parameters
+ * @description Retrieves at most 10 feedback reports submitted by a specific user, depending on the page number provided. Calling user must have the same Id as the one provided in the request parameters
  * @param {Object} Request
  * @param {string} Request.params.submitterId - Id of submitter
  * @param {number} Request.body.page -= Page number of reports to retrieve
@@ -319,7 +315,7 @@ router.post('/replyTo/:_id', async (req: Request, res: Response) => {
             repliedDate?: string;
         };
         if (!_id) {
-            throw Error('Missing bug report Id');
+            throw Error('Missing feedback report Id');
         }
         if (!user || Object.keys(user).length === 0) {
             throw Error('Missing user');
@@ -343,4 +339,5 @@ router.post('/replyTo/:_id', async (req: Request, res: Response) => {
         res.sendStatus(400);
     }
 });
+
 export default router;
