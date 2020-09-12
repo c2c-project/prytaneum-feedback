@@ -32,18 +32,25 @@ export const createReport = (
 /**
  * @description Retrieves at most 10 reports from the feedback-reports collection depending on the page number.
  * @param {number} page - Page number to return. If the page number exceeds the number of available pages, 0 reports are returned.
- * @param {string} ascending - Describes the sorted order of the reports.'True' for ascending. 'False' for descending.
+ * @param {boolean} sortByDate - Sort by date order. True for ascending. False for descending.
+ * @param {boolean} resolved - Resolved status of reports to retrieve
  * @returns {Promise<FeedbackReport[]>} - promise that will produce an array of feedback reports.
  */
 const numberOfDocumentsPerPage = 10;
 export const getReports = (
     page: number,
-    ascending: string
+    sortByDate: boolean,
+    resolved?: boolean
 ): Promise<FeedbackReport[]> => {
+    const resolvedQuery =
+        typeof resolved === 'boolean'
+            ? { resolved }
+            : { $or: [{ resolved: true }, { resolved: false }] };
+
     return (
         Collections.FeedbackReport()
-            .find()
-            .sort({ date: ascending === 'true' ? 1 : -1 })
+            .find(resolvedQuery)
+            .sort({ date: sortByDate ? 1 : -1 })
             // If page is a negative number or undefined then we get the first page
             .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
             .limit(numberOfDocumentsPerPage)
@@ -54,18 +61,18 @@ export const getReports = (
 /**
  * @description Retrieves at most 10  feedback reports from a specific submitter, depending on the page number.
  * @param {number} page - Page number to return. If the page number exceeds the number of available pages, 0 reports are returned.
- * @param {string} ascending - Describes the sorted order of the reports.'True' for ascending. 'False' for descending.
+ * @param {boolean} sortByDate - Sort by date order. True for ascending. False for descending.
  * @param {string} submitterId - Id of the submitter.
  * @returns {Promise<FeedbackReport[]>} - Promise that will produce an array of feedback reports.
  */
 export const getReportBySubmitter = (
     page: number,
-    ascending: string,
+    sortByDate: boolean,
     submitterId: string
 ): Promise<FeedbackReport[]> => {
     return Collections.FeedbackReport()
         .find({ submitterId })
-        .sort({ date: ascending === 'true' ? 1 : -1 })
+        .sort({ date: sortByDate ? 1 : -1 })
         .skip(page > 0 ? numberOfDocumentsPerPage * (page - 1) : 0)
         .limit(numberOfDocumentsPerPage)
         .toArray();
@@ -80,7 +87,6 @@ export const getReportById = (_id: string): Promise<FeedbackReport | null> => {
     return Collections.FeedbackReport().findOne({ _id: new ObjectId(_id) });
 };
 
-// TODO: Check if adding no returns is fine for this type of function.
 /**
  * @description Updates the description of a feedback report specified by its unique Id.
  * @param {string} _id - Id of the feedback report to update.
@@ -125,4 +131,53 @@ export const getNumberOfFeedbackReportsBySubmitter = (
     submitterId: string
 ): Promise<number> => {
     return Collections.FeedbackReport().countDocuments({ submitterId });
+};
+
+/**
+ * @description Sets the resolved attribute of a feedback report to the resolvedStatus provided.
+ * @param {string} _id -  Id of the report
+ * @param {boolean} resolvedStatus - resolved status
+ * @returns Mongodb promise
+ */
+export const updateResolvedStatus = (
+    _id: string,
+    resolvedStatus: boolean
+): Promise<UpdateWriteOpResult> => {
+    return Collections.FeedbackReport().updateOne(
+        { _id: new ObjectId(_id) },
+        { $set: { resolved: resolvedStatus } }
+    );
+};
+
+/**
+ * @description Adds a reply to a report
+ * @param {Object} user - user object of the replier
+ * @param {string} _id -  Id of the report
+ * @param {string} replyContent - Content of the reply
+ * @param {string} repliedDate - Date when the reply is submitted
+ * @returns Mongodb promise
+ */
+export const replyToFeedbackReport = (
+    user: User,
+    _id: string,
+    replyContent: string,
+    repliedDate: string
+): Promise<UpdateWriteOpResult> => {
+    return Collections.FeedbackReport().updateOne(
+        { _id: new ObjectId(_id) },
+        {
+            $push: {
+                replies: {
+                    $each: [
+                        {
+                            content: replyContent,
+                            repliedDate: new Date(repliedDate),
+                            repliedBy: user,
+                        },
+                    ],
+                    $sort: { repliedDate: 1 },
+                },
+            },
+        }
+    );
 };

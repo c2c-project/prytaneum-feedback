@@ -11,6 +11,8 @@ import {
     deleteReport,
     getNumberOfFeedbackReports,
     getNumberOfFeedbackReportsBySubmitter,
+    updateResolvedStatus,
+    replyToFeedbackReport,
 } from 'modules/feedback-reports';
 
 const router = express.Router();
@@ -57,35 +59,37 @@ router.post('/create-report', async (req: Request, res: Response) => {
 });
 
 /**
- * @description Retrieves at most 10 reports from the feedback-reports collection, depending on the page number provided. Calling user must have admin permission.
- * @param {Object} Request.query
- * @param {string} Request.query.page - Number of page of reports to retrieve
- * @param {string} Request.query.ascending - Sort by date order. Either 'true' or 'false'
+ * @description Retrieves at most 10 feedback reports from the database, depending on the page number provided. Calling user must be have admin permission.
+ * @param {Object} Request.body
+ * @param {number} Request.body.page - Number of page of reports to retrieve
+ * @param {boolean} Request.body.sortByDate - Sort by date order. True for ascending. False for descending.
+ * @param {boolean} Request.body.resolved - Returns reports with this resolved status. If not provided, all reports are returned
  * @returns {Object} Response
- * @returns {FeedbackReport[]} Response.reports - Array of reports retrieved from the collection
- * @returns {number} Response.count - Total count of reports in the collection
+ * @returns {FeedbackReport[]} Response.reports - Array of feedback reports retrieved from the database
+ * @returns {number} Response.count - Total count of feedback reports in the database
  */
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
-        const { page, ascending } = req.query as {
-            page?: string;
-            ascending?: string;
+        const { page, sortByDate, resolved } = req.body as {
+            page?: number;
+            sortByDate?: boolean;
+            resolved?: boolean;
         };
+        if (typeof page !== 'number') {
+            throw Error('Invalid page number');
+        }
+        if (typeof sortByDate !== 'boolean') {
+            throw Error('Invalid sortByDate');
+        }
 
-        if (!page) {
-            throw Error('Missing page number');
-        }
-        if (!ascending) {
-            throw Error('Missing ascending');
-        }
         const feedbackReports: FeedbackReport[] = await getReports(
-            parseInt(page, 10),
-            ascending
+            page,
+            sortByDate,
+            resolved
         );
 
         const countOfReports = await getNumberOfFeedbackReports();
-
         res.status(200).send({
             reports: feedbackReports,
             count: countOfReports,
@@ -105,21 +109,21 @@ interface UserRequestBody {
  * @description Retrieves all feedback reports submitted by a specific user. Calling user must have the same Id as the one provided in the request parameters
  * @param {Object} Request
  * @param {string} Request.params.submitterId - Id of submitter
- * @param {string} Request.query.page - Number of page of reports to retrieve
- * @param {string} Request.query.ascending - Sort by date order. Either 'true' or 'false'
+ * @param {number} Request.body.page -= Page number of reports to retrieve
+ * @param {boolean} Request.body.sortByDate - Sort by date order. True for ascending. False for descending.
  * @param {Object} Request.body.user - User that submits the report
  * @param {string} Request.body.user._id - Id of the user
  * @returns {Object} Response
- * @returns {FeedbackReport[]} Response.reports - Array of reports submitted by the user retrieved from the collection
- * @returns {number} Response.count -  Total count of reports submitted by the user in the collection
+ * @returns {FeedbackReport[]} Response.reports - Array of feedback reports retrieved from the database
+ * @returns {number} Response.count -  Total count of feedback reports submitted by a user  in the database
  */
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
         const { submitterId } = req.params as { submitterId: string };
-        const { user } = req.body as UserRequestBody;
-        const { page, ascending } = req.query as {
-            page?: string;
-            ascending?: string;
+        const { user, page, sortByDate } = req.body as {
+            user?: User;
+            page?: number;
+            sortByDate?: boolean;
         };
 
         if (!user) {
@@ -131,15 +135,16 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
         if (submitterId !== user._id) {
             throw Error('Calling user is not owner of the report');
         }
-        if (!page) {
-            throw Error('Missing page number');
+        if (typeof page !== 'number') {
+            throw Error('Invalid page number');
         }
-        if (!ascending) {
-            throw Error('Missing ascending');
+        if (typeof sortByDate !== 'boolean') {
+            throw Error('Invalid sortByDate');
         }
+
         const feedbackReports: FeedbackReport[] = await getReportBySubmitter(
-            parseInt(page, 10),
-            ascending,
+            page,
+            sortByDate,
             submitterId
         );
 
@@ -258,4 +263,84 @@ router.post('/delete-report', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * @description Marks a feedback report as resolved or unresolved
+ * @param {Object} Request.params
+ * @param {string} Request.params._id - Id of the report to mark as resolved
+ * @param {Object} Request.body.user - User that requests the update
+ * @param {boolean} Request.body.resolvedStatus - Value used to set the resolvedStatus of the report. true for resolved. false for unresolved
+ * @returns {Object} Response
+ * */
+
+// TODO: This endpoint should only work for admin users
+router.post(
+    '/updateResolvedStatus/:_id',
+    async (req: Request, res: Response) => {
+        try {
+            // TODO: If calling user does not have admin permissions, throw error
+            const { _id } = req.params as { _id: string };
+            const { resolvedStatus } = req.body as { resolvedStatus?: boolean };
+            if (!_id) {
+                throw Error('Missing report Id');
+            }
+            if (typeof resolvedStatus !== 'boolean') {
+                throw Error('Invalid resolved status');
+            }
+            await updateResolvedStatus(_id, resolvedStatus);
+            res.statusMessage = 'Resolved status successfully updated';
+            res.sendStatus(200);
+        } catch (error) {
+            log.error(error);
+            res.statusMessage = 'Some error occurred. Please try again';
+            res.sendStatus(400);
+        }
+    }
+);
+
+/**
+ * @description Adds a reply to a feedback report. Caller must have admin permission.
+ * @param {Object} Request.params
+ * @param {string} Request.params._id - Id of the report
+ * @param {Object} Request.body.user - User that replies to the report
+ * @param {string} Request.body.user._id - Id of replier
+ * @param {string} Request.body.replyContent - Content of the reply
+ * @param {string} Request.body.repliedDate - Date when reply is submitted
+ * @returns {Object} Response
+ * */
+
+// TODO: This endpoint should only works for admin users
+router.post('/replyTo/:_id', async (req: Request, res: Response) => {
+    try {
+        // TODO: If calling user does not have admin permissions, throw error
+        const { _id } = req.params as { _id: string };
+        const { user, replyContent, repliedDate } = req.body as {
+            user?: User;
+            replyContent?: string;
+            repliedDate?: string;
+        };
+        if (!_id) {
+            throw Error('Missing bug report Id');
+        }
+        if (!user || Object.keys(user).length === 0) {
+            throw Error('Missing user');
+        }
+        if (!user._id) {
+            throw Error('Missing user Id');
+        }
+        if (!replyContent) {
+            throw Error('Missing reply content');
+        }
+        if (!repliedDate) {
+            throw Error('Missing reply content');
+        }
+
+        await replyToFeedbackReport(user, _id, replyContent, repliedDate);
+        res.statusMessage = 'Reply successfully submitted';
+        res.sendStatus(200);
+    } catch (error) {
+        log.error(error);
+        res.statusMessage = 'Some error occurred. Please try again';
+        res.sendStatus(400);
+    }
+});
 export default router;
