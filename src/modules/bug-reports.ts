@@ -39,7 +39,6 @@ export const createReport = (
  * @param {boolean} sortByDate - Sort by date order. True for ascending. False for descending.
  * @param {boolean} resolved - Resolved status of reports to retrieve
  * @returns {Promise<BugReport[]>} - promise that will produce an array of bug reports.
- * @
  */
 const numberOfDocumentsPerPage = 10;
 export const getReports = (
@@ -87,13 +86,11 @@ export const getReportBySubmitter = (
  * @description Retrieves at most one bug report specified by its unique Id.
  * @param {string} _id -  Id of the bug report to return
  * @returns {Promise<BugReport | null>} - Promise that will produce a bug report or null if no bug report was found in the collection.
- * @
  */
 export const getReportById = (_id: string): Promise<BugReport | null> => {
     return Collections.BugReport().findOne({ _id: new ObjectId(_id) });
 };
 
-// TODO: Check if adding no returns is fine for this type of function.
 /**
  * @description Updates the description of a bug report specified by its unique Id.
  * @param {string} _id - Id of the bug report to update.

@@ -239,7 +239,7 @@ describe('bug-reports', () => {
             });
             expect(status).toStrictEqual(400);
         });
-        it('should pass since infinite positive page number breaks mongo query', async () => {
+        it('should fail since infinite positive page number breaks mongo query', async () => {
             const { status } = await request(app).get(endpoint).send({
                 page: Number.POSITIVE_INFINITY,
                 sortByDate: true,
@@ -785,7 +785,7 @@ describe('bug-reports', () => {
                 });
             expect(status).toStrictEqual(400);
         });
-        it('should pass since valid resolved status ("true") is sent', async () => {
+        it('should pass since valid resolved status is sent. Case 1', async () => {
             const { status } = await request(app)
                 .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
                 .send({
@@ -793,7 +793,7 @@ describe('bug-reports', () => {
                 });
             expect(status).toStrictEqual(200);
         });
-        it('should pass since valid resolved status ("false") is sent', async () => {
+        it('should pass since valid resolved status is sent. Case 2', async () => {
             const { status } = await request(app)
                 .post(`${endpoint}/${testReports[0]._id.toHexString()}`)
                 .send({

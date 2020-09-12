@@ -68,14 +68,14 @@ router.post('/create-report', async (req: Request, res: Response) => {
 });
 
 /**
- * @description Retrieves at most 10 reports from the bug-reports collection, depending on the page number provided. Calling user must be have admin permission.
+ * @description Retrieves at most 10 bug reports from the database, depending on the page number provided. Calling user must be have admin permission.
  * @param {Object} Request.body
  * @param {number} Request.body.page - Number of page of reports to retrieve
  * @param {boolean} Request.body.sortByDate - Sort by date order. True for ascending. False for descending.
  * @param {boolean} Request.body.resolved - Returns reports with this resolved status. If not provided, all reports are returned
  * @returns {Object} Response
- * @returns {BugReport[]} Response.reports - Array of reports retrieved from the collection
- * @returns {number} Response.count - Total count of reports in the collection
+ * @returns {BugReport[]} Response.reports - Array of bug reports retrieved from the database
+ * @returns {number} Response.count - Total count of bug reports in the database
  */
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
@@ -106,6 +106,7 @@ router.get('/get-reports', async (req: Request, res: Response) => {
         res.sendStatus(400);
     }
 });
+
 /**
  * @description Retrieves all bug reports submitted by a specific user. Calling user must have the same Id as the one provided in the request parameters
  * @param {Object} Request
@@ -115,8 +116,8 @@ router.get('/get-reports', async (req: Request, res: Response) => {
  * @param {Object} Request.body.user - User that submits the report
  * @param {string} Request.body.user._id - Id of the user
  * @returns {Object} Response
- * @returns {BugReport[]} Response.reports - Array of reports submitted by the user retrieved from the collection
- * @returns {number} Response.count -  Total count of reports submitted by the user in the collection
+ * @returns {BugReport[]} Response.reports - Array of bug reports retrieved from the database
+ * @returns {number} Response.count -  Total count of reports submitted by the a user in the database
  */
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
@@ -337,4 +338,5 @@ router.post('/replyTo/:_id', async (req: Request, res: Response) => {
         res.sendStatus(400);
     }
 });
+
 export default router;
