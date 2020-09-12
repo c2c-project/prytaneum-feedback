@@ -60,10 +60,10 @@ router.post('/create-report', async (req: Request, res: Response) => {
 
 /**
  * @description Retrieves at most 10 feedback reports from the database, depending on the page number and resolved status provided. Calling user must be have admin permission.
- * @param {Object} Request.body
- * @param {number} Request.body.page - Number of page of reports to retrieve
- * @param {boolean} Request.body.sortByDate - Sort by date order. True for ascending. False for descending.
- * @param {boolean} Request.body.resolved - Returns reports with this resolved status. If not provided, all reports are returned
+ * @param {Object} Request.query
+ * @param {string} Request.query.page - Page number of reports to retrieve
+ * @param {string} Request.query.sortByDate - Sort by date order. True for ascending. False for descending.
+ * @param {string} Request.query.resolved - Returns reports with this resolved status. If not provided, all reports are returned
  * @returns {Object} Response
  * @returns {FeedbackReport[]} Response.reports - Array of feedback reports retrieved from the database
  * @returns {number} Response.count - Total count of feedback reports in the database
@@ -71,22 +71,36 @@ router.post('/create-report', async (req: Request, res: Response) => {
 router.get('/get-reports', async (req: Request, res: Response) => {
     // TODO: ADD VALIDATION. THIS API ENDPOINT CAN ONLY BE CALLED FROM THE ADMIN MICRO SERVICE
     try {
-        const { page, sortByDate, resolved } = req.body as {
-            page?: number;
-            sortByDate?: boolean;
-            resolved?: boolean;
+        const { page, sortByDate, resolved } = req.query as {
+            page?: string;
+            sortByDate?: string;
+            resolved?: string;
         };
-        if (typeof page !== 'number') {
+
+        if (!page) {
             throw Error('Invalid page number');
         }
-        if (typeof sortByDate !== 'boolean') {
+        if (Number.isNaN(parseInt(page, 10))) {
+            throw Error('Invalid page number');
+        }
+        if (sortByDate !== 'true' && sortByDate !== 'false') {
             throw Error('Invalid sortByDate');
         }
 
+        let resolvedParamater: boolean | undefined;
+
+        if (resolved) {
+            if (resolved !== 'true' && resolved !== 'false') {
+                throw Error('Invalid resolved');
+            } else {
+                resolvedParamater = resolved === 'true';
+            }
+        }
+
         const feedbackReports: FeedbackReport[] = await getReports(
-            page,
-            sortByDate,
-            resolved
+            parseInt(page, 10),
+            sortByDate === 'true',
+            resolvedParamater
         );
 
         const countOfReports = await getNumberOfFeedbackReports();
@@ -105,8 +119,8 @@ router.get('/get-reports', async (req: Request, res: Response) => {
  * @description Retrieves at most 10 feedback reports submitted by a specific user, depending on the page number provided. Calling user must have the same Id as the one provided in the request parameters
  * @param {Object} Request
  * @param {string} Request.params.submitterId - Id of submitter
- * @param {number} Request.body.page -= Page number of reports to retrieve
- * @param {boolean} Request.body.sortByDate - Sort by date order. True for ascending. False for descending.
+ * @param {string} Request.query.page - Page number of reports to retrieve
+ * @param {string} Request.query.sortByDate - Sort by date order. True for ascending. False for descending.
  * @param {Object} Request.body.user - User that submits the report
  * @param {string} Request.body.user._id - Id of the user
  * @returns {Object} Response
@@ -115,12 +129,12 @@ router.get('/get-reports', async (req: Request, res: Response) => {
  */
 router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
     try {
-        const { submitterId } = req.params as { submitterId: string };
-        const { user, page, sortByDate } = req.body as {
-            user?: User;
-            page?: number;
-            sortByDate?: boolean;
+        const { submitterId } = req.params;
+        const { page, sortByDate } = req.query as {
+            page?: string;
+            sortByDate?: string;
         };
+        const { user } = req.body as { user: User };
 
         if (!user) {
             throw Error('Missing user object');
@@ -131,16 +145,19 @@ router.get('/get-reports/:submitterId', async (req: Request, res: Response) => {
         if (submitterId !== user._id) {
             throw Error('Calling user is not owner of the report');
         }
-        if (typeof page !== 'number') {
+        if (!page) {
             throw Error('Invalid page number');
         }
-        if (typeof sortByDate !== 'boolean') {
+        if (Number.isNaN(parseInt(page, 10))) {
+            throw Error('Invalid page number');
+        }
+        if (sortByDate !== 'true' && sortByDate !== 'false') {
             throw Error('Invalid sortByDate');
         }
 
         const feedbackReports: FeedbackReport[] = await getReportBySubmitter(
-            page,
-            sortByDate,
+            parseInt(page, 10),
+            sortByDate === 'true',
             submitterId
         );
 

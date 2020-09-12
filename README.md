@@ -70,7 +70,7 @@ Collection that stores bug reports of the form:
         -   HTTP Method: Get
         -   Description: Retrieves at most 10 reports from the feedback-reports collection, depending on the page number and resolved status provided
         -   Permission needed: Admin user
-        -   Body of request:
+        -   Query parameters:
             ```
                 {
                     page: Number, // Page number of reports
@@ -94,14 +94,19 @@ Collection that stores bug reports of the form:
         - HTTP Method: Get
         - Description: Retrieves at most 10 feedback reports submitted by a specific user, depending on the page number provided
         - Permission needed: Calling user must posses the same Id as the one provided in the request parameters
+        - Query parameters:
+            ```
+            {
+                page: Number, // Page number of reports
+                sortByDate: Boolean // Sort by date order
+            }
+            ```
         - Body of the request:
             ```
                 {
-                    page: Number, // Page number of reports
-                    sortByDate: Boolean, // Sort by date order
                     user: {
                         _id: ObjectId // Id of calling User
-                    },
+                    }
                 }
             ```
         - Parameters:
@@ -235,7 +240,7 @@ Collection that stores bug reports of the form:
         -   HTTP Method: Get
         -   Description: Retrieves at most 10 reports from the bug-reports collection, depending on the page number and resolved status provided
         -   Permission needed: Admin user
-        -   Body of the request:
+        -   Query parameters:
             ```
                 {
                     page: Number, // Page number of reports
@@ -259,14 +264,19 @@ Collection that stores bug reports of the form:
         - HTTP Method: Get
         - Description: Retrieves at most 10 bug reports created by a specific user, depending on the page number and resolved status provided
         - Permission needed: Calling user must have the same Id as the one provided in the request parameters
-        - Body of the request:
+        -   Query parameters:
             ```
                 {
                     page: Number, // Page number of reports
-                    sortByDate: Boolean, // Sort by date order 
+                    sortByDate: Boolean // Sort by date order
+                }
+            ```
+        - Body of the request:
+            ```
+                {
                     user: {
                         _id: ObjectId // Id of calling User
-                    },
+                    }
                 }
             ```
         - Parameters:

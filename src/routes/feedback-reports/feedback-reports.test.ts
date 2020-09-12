@@ -168,94 +168,72 @@ describe('feedback-reports', () => {
             expect(status).toStrictEqual(400);
         });
         it('should fail since sortByDate query parameter is not provided', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: 0,
-            });
+            const { status } = await request(app).get(
+                `${endpoint}?page=0&sortByDate=`
+            );
             expect(status).toStrictEqual(400);
         });
         it('should pass since page and sortByDate query parameters are provided', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: 0,
-                sortByDate: true,
-            });
+            const { status } = await request(app)
+                .get(`${endpoint}?page=1&sortByDate=true`)
+                .send({
+                    page: 0,
+                    sortByDate: true,
+                });
             expect(status).toStrictEqual(200);
         });
         it('should pass since page number greater than current number of pages returns 0 feedback reports', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: 2,
-                sortByDate: false,
-            });
+            const { status } = await request(app).get(
+                `${endpoint}?page=2&sortByDate=false`
+            );
             expect(status).toStrictEqual(200);
         });
         it('should pass since negative page number gets returns first page', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: -1,
-                sortByDate: true,
-            });
+            const { status } = await request(app).get(
+                `${endpoint}?page=-1&sortByDate=true`
+            );
             expect(status).toStrictEqual(200);
         });
         it('should pass since negative big page number gets converted to page zero', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: -135423652764745672745741235,
-                sortByDate: true,
-            });
+            const { status } = await request(app).get(
+                `${endpoint}?page=-135423652764745672745741235&sortByDate=true`
+            );
             expect(status).toStrictEqual(200);
         });
         it('should fail since big positive page number is passed', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: 135423652764745672745741235,
-                sortByDate: false,
-            });
+            const { status } = await request(app).get(
+                `${endpoint}?page=135423652764745672745741235&sortByDate=false`
+            );
             expect(status).toStrictEqual(400);
         });
-        it('should fail since infinite page number breaks mongo query', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: Number.POSITIVE_INFINITY,
-                sortByDate: false,
-            });
+        it('should fail since infinite page number is invalid', async () => {
+            const { status } = await request(app).get(
+                `${endpoint}?page=${Number.POSITIVE_INFINITY}&sortByDate=false`
+            );
             expect(status).toStrictEqual(400);
         });
         it('should fail since string for page number is invalid', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: faker.random.word(),
-                sortByDate: true,
-            });
+            const { status } = await request(app).get(
+                `${endpoint}?page=${faker.random.word()}&sortByDate=true`
+            );
             expect(status).toStrictEqual(400);
         });
         it('should fail since random long string for page number is invalid', async () => {
-            const { status } = await request(app)
-                .get(endpoint)
-                .send({
-                    page: faker.random.words(40),
-                    sortByDate: false,
-                });
+            const { status } = await request(app).get(
+                `${endpoint}?page=${faker.random.words(40)}&sortByDate=false`
+            );
             expect(status).toStrictEqual(400);
         });
         it('should fail since page number is not sent', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                sortByDate: false,
-            });
+            const { status } = await request(app).get(
+                `${endpoint}?page=&sortByDate=false`
+            );
             expect(status).toStrictEqual(400);
         });
-        it('should pass since required parameters are provided. Case 1', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: 1,
-                sortByDate: true,
-            });
-            expect(status).toStrictEqual(200);
-        });
-        it('should pass since required parameters are provided. Case 2', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: 1,
-                sortByDate: false,
-            });
-            expect(status).toStrictEqual(200);
-        });
-        it('should fail since random value for sortByDate parameter is provided', async () => {
-            const { status } = await request(app).get(endpoint).send({
-                page: 1,
-                sortByDate: faker.random.word(),
-            });
+        it('should fail since random string for sortByDate parameter is provided', async () => {
+            const { status } = await request(app).get(
+                `${endpoint}?page=1&sortByDate=${faker.random.word()}`
+            );
             expect(status).toStrictEqual(400);
         });
     });
@@ -269,134 +247,122 @@ describe('feedback-reports', () => {
         });
         it('should fail since empty user object is sent', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}`)
+                .get(`${endpoint}/${testUser1._id}?page=10&sortByDate=true`)
                 .send({
                     user: {},
-                    page: 10,
-                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since user object is undefined', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}`)
+                .get(`${endpoint}/${testUser1._id}?page=5&sortByDate=true`)
                 .send({
                     user: undefined,
-                    page: 5,
-                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since user object is null', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}`)
+                .get(`${endpoint}/${testUser1._id}?page=9&sortByDate=false`)
                 .send({
                     user: null,
-                    page: 9,
-                    sortByDate: false,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since calling user id and submitter id do not match', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}`)
+                .get(`${endpoint}/${testUser1._id}?page=10&sortByDate=true`)
                 .send({
                     user: testUser2,
-                    page: 10,
-                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since random long string is sent for submitterId', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${faker.lorem.paragraphs()}`)
+                .get(
+                    `${endpoint}/${faker.lorem.paragraphs()}?page=1&sortByDate=false`
+                )
                 .send({
                     user: testUser2,
-                    page: 1,
-                    sortByDate: false,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since random long string and integer values are sent for submitterId and user', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${faker.lorem.paragraphs()}`)
+                .get(
+                    `${endpoint}/${faker.lorem.paragraphs()}?page=10&sortByDate=true`
+                )
                 .send({
                     user: Number.MAX_VALUE,
-                    page: 10,
-                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should pass since big submitter ids match but do not belong to any feedback report', async () => {
             const randomId = faker.random.alphaNumeric(12);
             const { status } = await request(app)
-                .get(`${endpoint}/${randomId}`)
+                .get(`${endpoint}/${randomId}?page=10&sortByDate=true`)
                 .send({
                     user: {
                         _id: randomId,
                     },
-                    page: 10,
-                    sortByDate: true,
                 });
             expect(status).toStrictEqual(200);
         });
         it('should fail since random submitter ids match but are not the same type', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${Number.MAX_VALUE}`)
+                .get(`${endpoint}/${Number.MAX_VALUE}?page=357&sortByDate=true`)
                 .send({
                     user: {
                         _id: Number.MAX_VALUE,
                     },
-                    page: 1,
-                    sortByDate: true,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should pass since calling user id and submitter id  match and query parameters are passed', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}`)
+                .get(`${endpoint}/${testUser1._id}?page=1&sortByDate=true`)
                 .send({
                     user: testUser1,
-                    page: 1,
-                    sortByDate: true,
                 });
             expect(status).toStrictEqual(200);
         });
         it('should fail since sortByDate query parameter is not sent', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}?page=1`)
+                .get(`${endpoint}/${testUser1._id}?page=1&sortByDate=`)
                 .send({
                     user: testUser1,
-                    page: 1,
                 });
             expect(status).toStrictEqual(400);
         });
-        it('should fail snice page query parameters is not sent', async () => {
+        it('should fail since page query parameters is not sent', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}`)
+                .get(`${endpoint}/${testUser1._id}?page=&sortByDate=false`)
                 .send({
                     user: testUser1,
-                    sortByDate: false,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since a random non-number value is sent for page', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}`)
+                .get(
+                    `${endpoint}/${
+                        testUser1._id
+                    }?page=${faker.lorem.paragraph()}&sortByDate=false`
+                )
                 .send({
                     user: testUser1,
-                    page: faker.lorem.paragraph(),
-                    sortByDate: false,
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since a random non-boolean value is sent for sortByDate', async () => {
             const { status } = await request(app)
-                .get(`${endpoint}/${testUser1._id}`)
+                .get(
+                    `${endpoint}/${
+                        testUser1._id
+                    }?page=10&sortByDate=${faker.random.number()}`
+                )
                 .send({
                     user: testUser1,
-                    page: 10,
-                    sortByDate: faker.random.number(),
                 });
             expect(status).toStrictEqual(400);
         });
