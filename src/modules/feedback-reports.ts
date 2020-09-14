@@ -11,20 +11,19 @@ import { FeedbackReport, User } from 'lib/interfaces';
 
 /**
  * @description Creates a new feedback report.
- * @param {string} date - Date when the feedback report was concentrated at.
  * @param {string} description - Description of the feedback report.
  * @param {Object} user - Represents the submitter of the feedback report.
  * @returns MongoDB promise
  */
 export const createReport = (
-    date: string | Date,
     description: string,
     user: User
 ): Promise<InsertOneWriteOpResult<WithId<FeedbackReport>>> => {
     return Collections.FeedbackReport().insertOne({
-        date: new Date(date),
+        date: new Date(),
         description,
         submitterId: user._id,
+        resolved: false,
         replies: [],
     });
 };
@@ -154,14 +153,12 @@ export const updateResolvedStatus = (
  * @param {Object} user - user object of the replier
  * @param {string} _id -  Id of the report
  * @param {string} replyContent - Content of the reply
- * @param {string} repliedDate - Date when the reply is submitted
  * @returns Mongodb promise
  */
 export const replyToFeedbackReport = (
     user: User,
     _id: string,
-    replyContent: string,
-    repliedDate: string
+    replyContent: string
 ): Promise<UpdateWriteOpResult> => {
     return Collections.FeedbackReport().updateOne(
         { _id: new ObjectId(_id) },
@@ -171,7 +168,7 @@ export const replyToFeedbackReport = (
                     $each: [
                         {
                             content: replyContent,
-                            repliedDate: new Date(repliedDate),
+                            repliedDate: new Date(),
                             repliedBy: user,
                         },
                     ],

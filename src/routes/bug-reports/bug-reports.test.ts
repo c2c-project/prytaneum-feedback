@@ -57,7 +57,6 @@ describe('bug-reports', () => {
         });
         it('should fail since bug report townhall Id is empty', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: 'I am a test',
                 townhallId: '',
                 user: testUser1,
@@ -66,32 +65,13 @@ describe('bug-reports', () => {
         });
         it('should fail since bug report townhall Id is missing', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: 'I am a test',
-                user: testUser1,
-            });
-            expect(status).toStrictEqual(400);
-        });
-        it('should fail since bug report date is empty', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                date: '',
-                description: 'I am a test',
-                townhallId: new ObjectId(),
-                user: testUser1,
-            });
-            expect(status).toStrictEqual(400);
-        });
-        it('should fail since bug report date is missing', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                description: 'I am a test',
-                townhallId: new ObjectId(),
                 user: testUser1,
             });
             expect(status).toStrictEqual(400);
         });
         it('should fail since bug report description is empty', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: '',
                 townhallId: new ObjectId(),
                 user: testUser1,
@@ -100,7 +80,6 @@ describe('bug-reports', () => {
         });
         it('should fail since bug report description is missing', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 townhallId: new ObjectId(),
                 user: testUser1,
             });
@@ -108,7 +87,6 @@ describe('bug-reports', () => {
         });
         it('should fail since request is missing user', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: 'I am a test',
                 townhallId: new ObjectId(),
             });
@@ -116,7 +94,6 @@ describe('bug-reports', () => {
         });
         it('should fail since user object is empty', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: 'I am a test',
                 townhallId: new ObjectId(),
                 user: {},
@@ -127,11 +104,10 @@ describe('bug-reports', () => {
             const { status } = await request(app)
                 .post(endpoint)
                 .send({
-                    date: new Date().toISOString(),
                     description: 'I am a test',
                     townhallId: new ObjectId(),
                     user: {
-                        junk: '2bfofc4',
+                        junk: faker.random.word(),
                     },
                 });
             expect(status).toStrictEqual(400);
@@ -139,16 +115,14 @@ describe('bug-reports', () => {
         it('should pass since a valid bug report is sent', async () => {
             // TODO: Check if the email was sent => Spy on the emit function on rabbitmq
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: 'I am buggy',
                 townhallId: new ObjectId(),
                 user: testUser1,
             });
             expect(status).toStrictEqual(200);
         });
-        it('should fail random string values in bug report fields', async () => {
+        it('should fail although random string values are sent for bug report fields', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: faker.lorem.paragraphs(),
                 description: faker.lorem.paragraphs(),
                 townhallId: faker.lorem.paragraphs(),
                 user: testUser1,
@@ -156,24 +130,27 @@ describe('bug-reports', () => {
             expect(status).toStrictEqual(200);
         });
         it('Should fail since infinite positive values break the insertion of document in db', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                date: Number.POSITIVE_INFINITY,
-                description: Number.POSITIVE_INFINITY,
-                user: testUser1,
-            });
+            const { status } = await request(app)
+                .post(endpoint)
+                .send({
+                    description: Number.POSITIVE_INFINITY,
+                    townhallId: faker.random.alphaNumeric(12),
+                    user: testUser1,
+                });
             expect(status).toStrictEqual(400);
         });
         it('Should fail since big negative integer values break the insertion of document in db', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                date: Number.NEGATIVE_INFINITY,
-                description: Number.NEGATIVE_INFINITY,
-                user: testUser1,
-            });
+            const { status } = await request(app)
+                .post(endpoint)
+                .send({
+                    description: Number.NEGATIVE_INFINITY,
+                    townhallId: faker.random.alphaNumeric(12),
+                    user: testUser1,
+                });
             expect(status).toStrictEqual(400);
         });
         it('should fail since undefined values are sent', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: undefined,
                 description: undefined,
                 townhallId: undefined,
                 user: undefined,
@@ -182,7 +159,6 @@ describe('bug-reports', () => {
         });
         it('should fail since null values are sent', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: null,
                 description: null,
                 townhallId: null,
                 user: null,
@@ -630,7 +606,7 @@ describe('bug-reports', () => {
                 .send({
                     _id: testReports[0]._id,
                     user: {
-                        junk: 'n57gb245',
+                        junk: faker.random.word(),
                     },
                 });
             expect(status).toStrictEqual(400);
@@ -773,7 +749,6 @@ describe('bug-reports', () => {
         it('should fail since user object is missing', async () => {
             const { status } = await request(app).post(endpoint).send({
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -781,7 +756,6 @@ describe('bug-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: undefined,
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -789,7 +763,6 @@ describe('bug-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: null,
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -797,7 +770,6 @@ describe('bug-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: {},
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -809,7 +781,6 @@ describe('bug-reports', () => {
                         _id: '',
                     },
                     replyContent: faker.lorem.paragraph(),
-                    repliedDate: new Date().toISOString(),
                 });
             expect(status).toStrictEqual(400);
         });
@@ -821,7 +792,6 @@ describe('bug-reports', () => {
                         _id: undefined,
                     },
                     replyContent: faker.lorem.paragraph(),
-                    repliedDate: new Date().toISOString(),
                 });
             expect(status).toStrictEqual(400);
         });
@@ -833,14 +803,12 @@ describe('bug-reports', () => {
                         _id: null,
                     },
                     replyContent: faker.lorem.paragraph(),
-                    repliedDate: new Date().toISOString(),
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since reply content is missing', async () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser1,
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -848,7 +816,6 @@ describe('bug-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser1,
                 replyContent: undefined,
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -856,30 +823,6 @@ describe('bug-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser1,
                 replyContent: null,
-                repliedDate: new Date().toISOString(),
-            });
-            expect(status).toStrictEqual(400);
-        });
-        it('should fail since replied date is missing', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                user: testUser1,
-                replyContent: faker.lorem.paragraphs(),
-            });
-            expect(status).toStrictEqual(400);
-        });
-        it('should fail since replied date is undefined', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                user: testUser1,
-                replyContent: faker.lorem.paragraphs(),
-                repliedDate: undefined,
-            });
-            expect(status).toStrictEqual(400);
-        });
-        it('should fail since replied date is null', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                user: testUser1,
-                replyContent: faker.lorem.paragraphs(),
-                repliedDate: null,
             });
             expect(status).toStrictEqual(400);
         });
@@ -887,7 +830,6 @@ describe('bug-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser1,
                 replyContent: faker.lorem.paragraphs(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(200);
         });
@@ -895,7 +837,6 @@ describe('bug-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser2,
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(200);
         });

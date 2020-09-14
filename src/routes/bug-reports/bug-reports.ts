@@ -24,7 +24,6 @@ interface CreateReportRequest extends BugReport {
 /**
  * @description Creates a new bug report and inserts it in the bugs-reports collection
  * @param {Object} Request.body
- * @param {string} Request.body.date - Date when report is created
  * @param {string} Request.body.description - Description of the report
  * @param {string} Request.body.townhallId - Id of townhall where bug was encountered
  * @param {Object} Request.body.user - User that submits the report
@@ -34,15 +33,11 @@ interface CreateReportRequest extends BugReport {
 router.post('/create-report', async (req: Request, res: Response) => {
     try {
         const {
-            date,
             description,
             townhallId,
             user,
         } = req.body as CreateReportRequest;
         // TODO: ADD MORE VERBOSE VALIDATION
-        if (!date) {
-            throw Error('Missing date');
-        }
         if (!description) {
             throw Error('Missing description');
         }
@@ -56,7 +51,7 @@ router.post('/create-report', async (req: Request, res: Response) => {
             throw Error('Missing user Id');
         }
 
-        await createReport(date, description, townhallId, user);
+        await createReport(description, townhallId, user);
         res.statusMessage = 'Bug report successfully submitted';
         res.sendStatus(200);
         // TODO: CALL SEND EMAIL MICRO SERVICE TO SEND EMAIL THANKING THE SUBMITTER FOR THE BUG REPORT
@@ -86,7 +81,6 @@ router.get('/get-reports', async (req: Request, res: Response) => {
             resolved?: string;
         };
 
-        let resolvedParamater: boolean | undefined;
 
         if (!page) {
             throw Error('Invalid page number');
@@ -98,18 +92,20 @@ router.get('/get-reports', async (req: Request, res: Response) => {
             throw Error('Invalid sortByDate');
         }
 
+        let resolvedParameter: boolean | undefined;
+
         if (resolved) {
             if (resolved !== 'true' && resolved !== 'false') {
                 throw Error('Invalid resolved');
             } else {
-                resolvedParamater = resolved === 'true';
+                resolvedParameter = resolved === 'true';
             }
         }
 
         const bugReports: BugReport[] = await getReports(
             parseInt(page, 10),
             sortByDate === 'true',
-            resolvedParamater
+            resolvedParameter
         );
 
         // TODO: Fix. So that it returns the count of report per the resolved query
@@ -317,7 +313,6 @@ router.post(
  * @param {Object} Request.body.user - User that replies to the report
  * @param {string} Request.body.user._id - Id of replier
  * @param {string} Request.body.replyContent - Content of the reply
- * @param {string} Request.body.repliedDate - Date when reply is submitted
  * @returns {Object} Response
  * */
 
@@ -326,10 +321,9 @@ router.post('/replyTo/:_id', async (req: Request, res: Response) => {
     try {
         // TODO: If calling user does not have admin permissions, throw error
         const { _id } = req.params as { _id: string };
-        const { user, replyContent, repliedDate } = req.body as {
+        const { user, replyContent } = req.body as {
             user?: User;
             replyContent?: string;
-            repliedDate?: string;
         };
         if (!_id) {
             throw Error('Missing bug report Id');
@@ -343,11 +337,7 @@ router.post('/replyTo/:_id', async (req: Request, res: Response) => {
         if (!replyContent) {
             throw Error('Missing reply content');
         }
-        if (!repliedDate) {
-            throw Error('Missing reply content');
-        }
-
-        await replyToBugReport(user, _id, replyContent, repliedDate);
+        await replyToBugReport(user, _id, replyContent);
         res.statusMessage = 'Reply successfully submitted';
         res.sendStatus(200);
     } catch (error) {

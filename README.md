@@ -52,7 +52,6 @@ Collection that stores bug reports of the form:
         -   Body of request:
                 ```
                     {
-                        date: String, // UTC
                         description: String,
                         user: {
                             _id: ObjectId
@@ -201,7 +200,6 @@ Collection that stores bug reports of the form:
                         _id: ObjectId // Id of calling User (replier)
                     },
                     replyContent: String, // Content of the reply
-                    repliedDate: string // Date when reply is submitted
                 }
             ```
         - Response:
@@ -220,7 +218,6 @@ Collection that stores bug reports of the form:
         -   Body of request:
             ```
                 {
-                    date: String, // UTC
                     townhallId: ObjectId,
                     description: String,
                     user: {
@@ -370,7 +367,6 @@ Collection that stores bug reports of the form:
                         _id: ObjectId // Id of calling User (replier)
                     },
                     replyContent: String, // Content of the reply
-                    repliedDate: string // Date when reply is submitted
                 }
             ```
         - Response:

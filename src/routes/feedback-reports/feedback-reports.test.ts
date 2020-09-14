@@ -52,24 +52,8 @@ describe('feedback-reports', () => {
             const { status } = await request(app).post(endpoint);
             expect(status).toStrictEqual(400);
         });
-        it('should fail since feedback report date is empty', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                date: '',
-                description: 'I am a test',
-                user: testUser1,
-            });
-            expect(status).toStrictEqual(400);
-        });
-        it('should fail since feedback report date is missing', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                description: 'I am a test',
-                user: testUser1,
-            });
-            expect(status).toStrictEqual(400);
-        });
         it('should fail since feedback report description is empty', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: '',
                 user: testUser1,
             });
@@ -77,21 +61,18 @@ describe('feedback-reports', () => {
         });
         it('should fail since feedback report description is missing', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 user: testUser1,
             });
             expect(status).toStrictEqual(400);
         });
         it('should fail since request is missing user', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: 'I am a test',
             });
             expect(status).toStrictEqual(400);
         });
         it('should fail since user object is empty', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: 'I am a test',
                 user: {},
             });
@@ -101,10 +82,9 @@ describe('feedback-reports', () => {
             const { status } = await request(app)
                 .post(endpoint)
                 .send({
-                    date: new Date().toISOString(),
                     description: 'I am a test',
                     user: {
-                        junk: '28tnvn84',
+                        junk: faker.random.word(),
                     },
                 });
             expect(status).toStrictEqual(400);
@@ -112,7 +92,6 @@ describe('feedback-reports', () => {
         it('should pass since a valid feedback report is sent', async () => {
             // TODO: Check if the email was sent => Spy on the emit function on rabbitmq
             const { status } = await request(app).post(endpoint).send({
-                date: new Date().toISOString(),
                 description: 'I am a test',
                 user: testUser1,
             });
@@ -120,7 +99,6 @@ describe('feedback-reports', () => {
         });
         it('should pass although random string values are sent in feedback report fields', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: faker.lorem.paragraphs(),
                 description: faker.lorem.paragraphs(),
                 user: testUser1,
             });
@@ -128,7 +106,6 @@ describe('feedback-reports', () => {
         });
         it('Should fail since positive infinite values break the insertion of document in db', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: Number.POSITIVE_INFINITY,
                 description: Number.POSITIVE_INFINITY,
                 user: testUser1,
             });
@@ -136,7 +113,6 @@ describe('feedback-reports', () => {
         });
         it('Should fail since negative infinite values break the insertion of document in db', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: Number.NEGATIVE_INFINITY,
                 description: Number.NEGATIVE_INFINITY,
                 user: testUser1,
             });
@@ -144,7 +120,6 @@ describe('feedback-reports', () => {
         });
         it('should fail since undefined values are sent', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: undefined,
                 description: undefined,
                 user: undefined,
             });
@@ -152,7 +127,6 @@ describe('feedback-reports', () => {
         });
         it('should fail since null values are sent', async () => {
             const { status } = await request(app).post(endpoint).send({
-                date: null,
                 description: null,
                 user: null,
             });
@@ -602,7 +576,7 @@ describe('feedback-reports', () => {
                 .send({
                     _id: testReports[0]._id,
                     user: {
-                        junk: '2bfofc4',
+                        junk: faker.random.word(),
                     },
                 });
             expect(status).toStrictEqual(400);
@@ -745,7 +719,6 @@ describe('feedback-reports', () => {
         it('should fail since user object is missing', async () => {
             const { status } = await request(app).post(endpoint).send({
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -753,7 +726,6 @@ describe('feedback-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: undefined,
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -761,7 +733,6 @@ describe('feedback-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: null,
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -769,7 +740,6 @@ describe('feedback-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: {},
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -781,7 +751,6 @@ describe('feedback-reports', () => {
                         _id: '',
                     },
                     replyContent: faker.lorem.paragraph(),
-                    repliedDate: new Date().toISOString(),
                 });
             expect(status).toStrictEqual(400);
         });
@@ -793,7 +762,6 @@ describe('feedback-reports', () => {
                         _id: undefined,
                     },
                     replyContent: faker.lorem.paragraph(),
-                    repliedDate: new Date().toISOString(),
                 });
             expect(status).toStrictEqual(400);
         });
@@ -805,14 +773,12 @@ describe('feedback-reports', () => {
                         _id: null,
                     },
                     replyContent: faker.lorem.paragraph(),
-                    repliedDate: new Date().toISOString(),
                 });
             expect(status).toStrictEqual(400);
         });
         it('should fail since reply content is missing', async () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser1,
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -820,7 +786,6 @@ describe('feedback-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser1,
                 replyContent: undefined,
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(400);
         });
@@ -828,30 +793,6 @@ describe('feedback-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser1,
                 replyContent: null,
-                repliedDate: new Date().toISOString(),
-            });
-            expect(status).toStrictEqual(400);
-        });
-        it('should fail since replied date is missing', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                user: testUser1,
-                replyContent: faker.lorem.paragraphs(),
-            });
-            expect(status).toStrictEqual(400);
-        });
-        it('should fail since replied date is undefined', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                user: testUser1,
-                replyContent: faker.lorem.paragraphs(),
-                repliedDate: undefined,
-            });
-            expect(status).toStrictEqual(400);
-        });
-        it('should fail since replied date is null', async () => {
-            const { status } = await request(app).post(endpoint).send({
-                user: testUser1,
-                replyContent: faker.lorem.paragraphs(),
-                repliedDate: null,
             });
             expect(status).toStrictEqual(400);
         });
@@ -859,7 +800,6 @@ describe('feedback-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser1,
                 replyContent: faker.lorem.paragraphs(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(200);
         });
@@ -867,7 +807,6 @@ describe('feedback-reports', () => {
             const { status } = await request(app).post(endpoint).send({
                 user: testUser2,
                 replyContent: faker.lorem.paragraph(),
-                repliedDate: new Date().toISOString(),
             });
             expect(status).toStrictEqual(200);
         });

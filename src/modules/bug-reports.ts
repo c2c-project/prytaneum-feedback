@@ -11,20 +11,18 @@ import { BugReport, User } from 'lib/interfaces';
 
 /**
  * @description Creates a new bug report. The state of a new report is non-resolved.
- * @param {string} date - Date when the bug report was concentrated at.
  * @param {string} description - Description of the bug report.
  * @param {string} townhallId - Id of the townhall session where the bug occurred.
  * @param {Object} user - Represents the submitter of the bug report.
  * @returns MongoDB promise
  */
 export const createReport = (
-    date: string | Date,
     description: string,
     townhallId: string,
     user: User
 ): Promise<InsertOneWriteOpResult<WithId<BugReport>>> => {
     return Collections.BugReport().insertOne({
-        date: new Date(date),
+        date: new Date(),
         description,
         townhallId,
         submitterId: user._id,
@@ -158,14 +156,12 @@ export const updateResolvedStatus = (
  * @param {Object} user - user object of the replier
  * @param {string} _id -  Id of the report
  * @param {string} replyContent - Content of the reply
- * @param {string} repliedDate - Date when the reply is submitted
  * @returns Mongodb promise
  */
 export const replyToBugReport = (
     user: User,
     _id: string,
-    replyContent: string,
-    repliedDate: string
+    replyContent: string
 ): Promise<UpdateWriteOpResult> => {
     return Collections.BugReport().updateOne(
         { _id: new ObjectId(_id) },
@@ -175,7 +171,7 @@ export const replyToBugReport = (
                     $each: [
                         {
                             content: replyContent,
-                            repliedDate: new Date(repliedDate),
+                            repliedDate: new Date(),
                             repliedBy: user,
                         },
                     ],

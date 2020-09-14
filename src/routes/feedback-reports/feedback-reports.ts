@@ -24,7 +24,6 @@ interface CreateReportRequest extends FeedbackReport {
 /**
  * @description Creates a new feedback report and inserts it in the feedback-reports collection.
  * @param {Object} Request.body
- * @param {string} Request.body.date - Date when report is created
  * @param {string} Request.body.description - Description of the report
  * @param {Object} Request.body.user - User that submits the report
  * @param {string} Request.body.user._id - Id of the user
@@ -32,11 +31,8 @@ interface CreateReportRequest extends FeedbackReport {
  */
 router.post('/create-report', async (req: Request, res: Response) => {
     try {
-        const { date, description, user } = req.body as CreateReportRequest;
+        const { description, user } = req.body as CreateReportRequest;
         // TODO: ADD MORE VERBOSE VALIDATION
-        if (!date) {
-            throw Error('Missing date');
-        }
         if (!description) {
             throw Error('Missing description');
         }
@@ -47,7 +43,7 @@ router.post('/create-report', async (req: Request, res: Response) => {
             throw Error('Missing user Id');
         }
 
-        await createReport(date, description, user);
+        await createReport(description, user);
         res.statusMessage = 'Feedback successfully submitted';
         res.sendStatus(200);
         // TODO: CALL SEND EMAIL MICRO SERVICE TO SEND EMAIL THANKING THE SUBMITTER FOR THE FEEDBACK
@@ -87,21 +83,23 @@ router.get('/get-reports', async (req: Request, res: Response) => {
             throw Error('Invalid sortByDate');
         }
 
-        let resolvedParamater: boolean | undefined;
+        let resolvedParameter: boolean | undefined;
 
         if (resolved) {
             if (resolved !== 'true' && resolved !== 'false') {
                 throw Error('Invalid resolved');
             } else {
-                resolvedParamater = resolved === 'true';
+                resolvedParameter = resolved === 'true';
             }
         }
 
         const feedbackReports: FeedbackReport[] = await getReports(
             parseInt(page, 10),
             sortByDate === 'true',
-            resolvedParamater
+            resolvedParameter
         );
+
+        console.log(feedbackReports);
 
         const countOfReports = await getNumberOfFeedbackReports();
         res.status(200).send({
@@ -317,7 +315,6 @@ router.post(
  * @param {Object} Request.body.user - User that replies to the report
  * @param {string} Request.body.user._id - Id of replier
  * @param {string} Request.body.replyContent - Content of the reply
- * @param {string} Request.body.repliedDate - Date when reply is submitted
  * @returns {Object} Response
  * */
 
@@ -326,10 +323,9 @@ router.post('/replyTo/:_id', async (req: Request, res: Response) => {
     try {
         // TODO: If calling user does not have admin permissions, throw error
         const { _id } = req.params as { _id: string };
-        const { user, replyContent, repliedDate } = req.body as {
+        const { user, replyContent } = req.body as {
             user?: User;
             replyContent?: string;
-            repliedDate?: string;
         };
         if (!_id) {
             throw Error('Missing feedback report Id');
@@ -343,11 +339,7 @@ router.post('/replyTo/:_id', async (req: Request, res: Response) => {
         if (!replyContent) {
             throw Error('Missing reply content');
         }
-        if (!repliedDate) {
-            throw Error('Missing reply content');
-        }
-
-        await replyToFeedbackReport(user, _id, replyContent, repliedDate);
+        await replyToFeedbackReport(user, _id, replyContent);
         res.statusMessage = 'Reply successfully submitted';
         res.sendStatus(200);
     } catch (error) {
