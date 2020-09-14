@@ -285,7 +285,7 @@ router.post('/delete-report', async (req: Request, res: Response) => {
 
 // TODO: This endpoint should only work for admin users
 router.post(
-    '/updateResolvedStatus/:_id',
+    '/update-resolved-status/:_id',
     async (req: Request, res: Response) => {
         try {
             // TODO: If calling user does not have admin permissions, throw error
@@ -319,7 +319,7 @@ router.post(
  * */
 
 // TODO: This endpoint should only works for admin users
-router.post('/replyTo/:_id', async (req: Request, res: Response) => {
+router.post('/reply-to/:_id', async (req: Request, res: Response) => {
     try {
         // TODO: If calling user does not have admin permissions, throw error
         const { _id } = req.params as { _id: string };

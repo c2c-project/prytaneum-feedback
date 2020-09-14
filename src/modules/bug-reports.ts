@@ -47,7 +47,7 @@ export const getReports = (
     const resolvedQuery =
         typeof resolved === 'boolean'
             ? { resolved }
-            : { $or: [{ resolved: true }, { resolved: false }] };
+            : {};
 
     return (
         Collections.BugReport()

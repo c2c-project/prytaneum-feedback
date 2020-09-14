@@ -41,10 +41,7 @@ export const getReports = (
     sortByDate: boolean,
     resolved?: boolean
 ): Promise<FeedbackReport[]> => {
-    const resolvedQuery =
-        typeof resolved === 'boolean'
-            ? { resolved }
-            : { $or: [{ resolved: true }, { resolved: false }] };
+    const resolvedQuery = typeof resolved === 'boolean' ? { resolved } : {};
 
     return (
         Collections.FeedbackReport()

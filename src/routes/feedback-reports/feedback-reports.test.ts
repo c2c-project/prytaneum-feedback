@@ -628,8 +628,8 @@ describe('feedback-reports', () => {
             expect(status).toStrictEqual(200);
         });
     });
-    describe('/updateResolvedStatus', () => {
-        const endpoint = '/api/feedback/updateResolvedStatus';
+    describe('/update-resolved-status', () => {
+        const endpoint = '/api/feedback/update-resolved-status';
 
         it('should fail since resolved status is not sent', async () => {
             const { status } = await request(app).post(
@@ -710,8 +710,8 @@ describe('feedback-reports', () => {
             expect(status).toStrictEqual(200);
         });
     });
-    describe('/replyTo', () => {
-        const endpoint = `/api/feedback/replyTo/${testReports[0]._id.toHexString()}`;
+    describe('/reply-to', () => {
+        const endpoint = `/api/feedback/reply-to/${testReports[0]._id.toHexString()}`;
         it('should fail since request body is not sent', async () => {
             const { status } = await request(app).post(endpoint);
             expect(status).toStrictEqual(400);
