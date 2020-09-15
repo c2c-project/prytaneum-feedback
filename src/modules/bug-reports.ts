@@ -44,10 +44,7 @@ export const getReports = (
     sortByDate: boolean,
     resolved?: boolean
 ): Promise<BugReport[]> => {
-    const resolvedQuery =
-        typeof resolved === 'boolean'
-            ? { resolved }
-            : {};
+    const resolvedQuery = typeof resolved === 'boolean' ? { resolved } : {};
 
     return (
         Collections.BugReport()
@@ -64,7 +61,7 @@ export const getReports = (
  * @description Retrieves at most 10 bug reports from a specific submitter, depending on the page number.
  * @param {number} page - Page number to return. If the page number exceeds the number of available pages, 0 reports are returned.
  * @param {boolean} sortByDate - Sort by date order. True for ascending. False for descending.
- * @param {string} submitterId - submitter's Id of reports to retrieve
+ * @param {string} submitterId - Submitter's Id of reports to retrieve
  * @returns {Promise<BugReport[]>} - Promise that will produce an array of bug reports.
  */
 export const getReportBySubmitter = (
@@ -118,10 +115,12 @@ export const deleteReport = (
 
 /**
  * @description Returns the total count of reports in the bug-reports collection
+ * @param {boolean} resolved Function counts reports that match this resolved status
  * @returns total count of bug reports
  */
-export const getNumberOfBugReports = (): Promise<number> => {
-    return Collections.BugReport().countDocuments();
+export const getNumberOfBugReports = (resolved?: boolean): Promise<number> => {
+    const resolvedQuery = typeof resolved === 'boolean' ? { resolved } : {};
+    return Collections.BugReport().countDocuments(resolvedQuery);
 };
 
 /**

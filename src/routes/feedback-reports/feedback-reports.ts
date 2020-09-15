@@ -99,9 +99,9 @@ router.get('/get-reports', async (req: Request, res: Response) => {
             resolvedParameter
         );
 
-        console.log(feedbackReports);
-
-        const countOfReports = await getNumberOfFeedbackReports();
+        const countOfReports = await getNumberOfFeedbackReports(
+            resolvedParameter
+        );
         res.status(200).send({
             reports: feedbackReports,
             count: countOfReports,

@@ -112,10 +112,14 @@ export const deleteReport = (
 
 /**
  * @description Returns the total count of reports in the feedback-reports collection
+ * @param {boolean} resolved Function counts reports that match this resolved status
  * @returns total count of feedback reports
  */
-export const getNumberOfFeedbackReports = (): Promise<number> => {
-    return Collections.FeedbackReport().countDocuments();
+export const getNumberOfFeedbackReports = (
+    resolved?: boolean
+): Promise<number> => {
+    const resolvedQuery = typeof resolved === 'boolean' ? { resolved } : {};
+    return Collections.FeedbackReport().countDocuments(resolvedQuery);
 };
 
 /**

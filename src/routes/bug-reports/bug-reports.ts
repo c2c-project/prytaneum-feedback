@@ -108,7 +108,7 @@ router.get('/get-reports', async (req: Request, res: Response) => {
         );
 
         // TODO: Fix. So that it returns the count of report per the resolved query
-        const countOfReports = await getNumberOfBugReports();
+        const countOfReports = await getNumberOfBugReports(resolvedParameter);
         res.status(200).send({ reports: bugReports, count: countOfReports });
     } catch (error) {
         log.error(error);
