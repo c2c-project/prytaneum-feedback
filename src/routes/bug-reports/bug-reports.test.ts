@@ -209,7 +209,6 @@ describe('bug-reports', () => {
             );
             expect(status).toStrictEqual(200);
         });
-        //  TODO: WATCH OUT
         it('should fail since big positive page number is passed', async () => {
             const { status } = await request(app).get(
                 `${endpoint}?page=135423652764745672745741235&sortByDate=true`

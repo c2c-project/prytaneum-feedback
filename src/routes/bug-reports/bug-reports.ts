@@ -315,7 +315,7 @@ router.post(
  * @returns {Object} Response
  * */
 
-// TODO: This endpoint should only works for admin users
+// TODO: This endpoint should only work for admin users
 router.post('/reply-to/:_id', async (req: Request, res: Response) => {
     try {
         // TODO: If calling user does not have admin permissions, throw error
