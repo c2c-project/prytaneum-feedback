@@ -1,14 +1,21 @@
 import { ObjectId } from 'mongodb';
 
+export interface User {
+    _id: string;
+}
+
+export interface Reply {
+    content: string;
+    repliedBy: User;
+    repliedDate: Date;
+}
 export interface Report {
     _id?: ObjectId;
     date: Date | string;
     description: string;
     submitterId: string;
-}
-
-export interface User {
-    _id: string;
+    resolved?: boolean;
+    replies: Reply[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
